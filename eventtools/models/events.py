@@ -23,8 +23,7 @@ Every EventBase model has several OccurrenceGenerators, each of which generate s
 
 You can get the OccurrenceGenerators with Event.generators (it's the reverse relation name).
 
-Since OccurrenceGenerators can generate a potentially infinite number of occurrences, you don't want to be able to get all the occurrences ever (it would take a while). You can tell whether an event has infinite amount of occurrences by seeing whether Event.get_last_day() returns a value. If it returns False, there's no end.
-
+Since OccurrenceGenerators can generate a potentially infinite number of occurrences, you don't want to be able to get all the occurrences ever (it would take a while).
 To get an Event's occurrences between two dates:
 
 Event.get_occurrences(start_date, end_date).
@@ -232,11 +231,11 @@ class EventBase(models.Model):
         return sorted(occs)
         
     def get_all_occurrences_if_possible(self):
-        if self.get_last_day():
+        if self.get_last_day() != datetime.datetime.max:
             return self.get_occurrences(self.first_generator.start, self.get_last_day())
     
     def occurrences_count(self):
-        if self.get_last_day():
+        if self.get_last_day() != datetime.datetime.max:
             return len(self.get_occurrences(self.first_generator.start, self.get_last_day()))
         else:
             return '&infin;'
@@ -267,7 +266,7 @@ class EventBase(models.Model):
                 lastdays.append(generator.repeat_until)
             else:
                 if generator.rule:
-                    return None
+                    return datetime.datetime.max
                 lastdays.append(generator.end)
             for varied in generator.get_changed_occurrences():
                 lastdays.append(varied.varied_end)
