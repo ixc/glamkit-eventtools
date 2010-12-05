@@ -364,7 +364,7 @@ class OccurrenceGeneratorBase(models.Model):
             next_occurrence = self.start
         if next_occurrence == date:
             try:
-                return self.OccurrenceModel.objects.get(generator__event = self, unvaried_start_date = date)
+                return self.OccurrenceModel.objects.get(generator = self, unvaried_start_date = date)
             except self.OccurrenceModel.DoesNotExist:
                 return self._create_occurrence(next_occurrence)
         # import pdb; pdb.set_trace()
