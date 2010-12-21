@@ -323,10 +323,10 @@ class OccurrenceGeneratorBase(models.Model):
             simple_rule = rrule.rrule(eval(frequency), dtstart=self.start, **params)
             set = rrule.rruleset()
             set.rrule(simple_rule)
-#             goodfriday = rrule.rrule(rrule.YEARLY, dtstart=self.start, byeaster=-2)
-#             christmas = rrule.rrule(rrule.YEARLY, dtstart=self.start, bymonth=12, bymonthday=25)
-#             set.exrule(goodfriday)
-#             set.exrule(christmas)
+            goodfriday = rrule.rrule(rrule.YEARLY, dtstart=self.start, byeaster=-2)
+            christmas = rrule.rrule(rrule.YEARLY, dtstart=self.start, bymonth=12, bymonthday=25)
+            set.exrule(goodfriday)
+            set.exrule(christmas)
             return set
    
     def check_for_exceptions(self, occ):
