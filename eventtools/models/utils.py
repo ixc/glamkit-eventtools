@@ -8,6 +8,12 @@ def datetimeify(d, clamp="start"):
         return datetime.combine(d, time.max)
     return datetime.combine(d, time.min)
 
+def dateify(d):
+    if isinstance(d, datetime):
+        return d.date()
+    return d
+
+
 class MergedObject():
     """
     Objects of this class behave as though they are a merge of two other objects (which we'll call General and Special). The attributes of Special override the corresponding attributes of General, *unless* the value of the attribute in Special == None.

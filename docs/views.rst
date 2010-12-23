@@ -1,0 +1,356 @@
+=====
+Views
+=====
+
+
+calendar
+========
+
+This view is for displaying metadata about calendars. Upcoming events, name, description and so on. This is probably not the best view for displaying a calendar in a traditional sense, i.e. displaying a month calendar or a year calendar, as it does not equip the context with any period objects. If you would like to do this you should use calendar_by_period.
+
+Required Arguments
+------------------
+
+``request``
+    As always the request object.
+
+``calendar_slug``
+    The slug of the calendar to be displayed.
+
+Optional Arguments
+------------------
+
+``template_name``
+    default
+        'events/calendar.html'
+    
+    This is the template that will be rendered.
+
+Context Variables
+-----------------
+
+``calendar``
+    The Calendar object designated by the ``calendar_slug``.
+
+calendar_by_period
+==================
+
+This view is for getting a calendar, but also getting periods with that
+calendar.  Which periods you get is designated with the list ``periods``. You
+can designate which date you want the periods to be initialised to, by passing
+a date in ``request.GET``. See the template tag ``query_string_for_date``.
+
+Required Arguments
+------------------
+
+``request``
+    As always the request object.
+
+``calendar_slug``
+    The slug of the calendar to be displayed.
+
+Optional Arguments
+------------------
+
+``template_name``
+    default
+        'events/calendar_by_period    .html'
+    
+    This is the template that will be rendered.
+
+``periods``
+    default
+        ``[]``
+    
+    This is a list of period subclasses that designates which periods you would like to instantiate and put in the context.
+    
+Context Variables
+-----------------
+
+``date``
+    This was the date that was generated from the query string.
+
+``periods``
+    This is a dictionary that returns the periods from the list you passed
+    in.  If you passed in Month and Day, then your dictionary would look
+    like this
+    
+    ::
+    
+        {
+            'month': <events.periods.Month object>
+            'day':   <events.periods.Day object>
+        }
+
+    So in the template to access the Day period in the context you simply
+    use ``periods.day``.
+
+``calendar``
+    This is the Calendar that is designated by the ``calendar_slug``.
+
+``weekday_names``
+    This is for convenience. It returns the local names of weekdays for
+    internationalization.
+
+event
+=====
+
+This view is for showing an event. It is important to remember that an 
+event is not an occurrence.  Events define a set of recurring occurrences.
+If you would like to display an occurrence (a single instance of a 
+recurring event) use ``occurrence``.
+
+Required Arguments
+------------------
+
+``request``
+    As always the request object.
+
+``event_id``
+    The id of the event to be displayed.
+
+Optional Arguments
+------------------
+
+``template_name``
+    default
+        'events/calendar_by_period.html'
+    
+    This is the template that will be rendered.
+
+
+
+Context Variables
+-----------------
+
+``event``
+    This is the event designated by the event_id.
+
+``back_url``
+    This is the url that referred to this view.
+
+occurrence
+==========
+
+This view is used to display an occurrence.  There are two methods of
+displaying an occurrence.  
+
+Required Arguments
+------------------
+
+``request``
+    As always the request object.
+
+``event_id``
+    the id of the event that produces the occurrence.
+
+From here you need a way to distinguish the occurrence and that involves.
+
+``occurrence_id``
+    if its exceptional
+
+**or** it requires a distinguishing datetime as designated by the keywords below. This should designate the original start date of the occurrence that you wish to access. Using ``get_absolute_url`` from the Occurrence model will help you standardise this.
+
+* ``year``
+* ``month``
+* ``day``
+* ``hour``
+* ``minute``
+* ``second``
+
+Optional Arguments
+------------------
+
+``template_name``
+    default
+        'events/calendar_by_period.html'
+    
+    This is the template that will be rendered.
+
+
+
+Context Variables
+-----------------
+
+``event``
+    The event that produces the occurrence.
+
+``occurrence`` 
+    The occurrence to be displayed.
+
+``back_url``
+    The url from which this request was referred.
+
+edit_occurrence
+===============
+
+This view is used to edit an occurrence.
+
+Required Arguments
+------------------
+
+``request``
+    As always the request object.
+
+``event_id``
+    The id for the event.
+
+From here you need a way to distinguish the occurrence and that involves
+
+``occurrence_id``
+    The id of the occurrence if its exceptional.
+
+**or** it requires a distinguishing datetime as designated by the keywords below. This should designate the original start date of the occurrence that you wish to access. Using ``get_edit_url`` from the Occurrence model will help you standardise this.
+
+* ``year``
+* ``month``
+* ``day``
+* ``hour``
+* ``minute``
+* ``second``
+
+Optional Arguments
+------------------
+
+``template_name``
+    default
+        'events/calendar_by_period.html'
+    
+    This is the template that will be rendered.
+
+
+
+Context Variables
+-----------------
+
+``form``
+    An instance of OccurrenceForm to be displayed.
+
+``occurrence``
+    An instance of the occurrence being modified.
+
+cancel_occurrence
+=================
+
+This view is used to cancel an occurrence. It is worth noting that cancelling an occurrence doesn't stop it from being in occurrence lists or being 'exceptional', it just changes the ``cancelled`` flag on the instance. It is important to check this flag when listing occurrences.
+
+Also if this view is requested via POST, it will cancel the event and redirect. If this view is accessed via a GET request it will display a confirmation page.
+
+Required Arguments
+------------------
+
+``request``
+    As always the request object.
+
+from here you need a way to distinguish the occurrence and that involves
+
+``occurrence_id``
+    if it's exceptional,
+
+**or** it requires a distinguishing datetime as designated by the keywords below. This should designate the original start date of the occurrence that you wish to access. Using get_cancel_url from the Occurrence model will help you standardise this.
+
+* ``year``
+* ``month``
+* ``day``
+* ``hour``
+* ``minute``
+* ``second``
+
+Optional Arguments
+------------------
+
+``template_name``
+    default
+        'events/calendar_by_period.html'
+    
+    This is the template that will be rendered, if this view is accessed via GET.
+
+``next``
+    default
+        The event detail page of ``occurrence.event``.
+    
+    This is the url to which you wish to be redirected after a successful cancellation.
+
+Context Variables
+-----------------
+
+``occurrence``
+    an instance of the occurrence being modified
+
+create_or_edit_event
+====================
+
+This view is used for creating or editing events. If it receives a GET request or if given an invalid form in a POST request it will render the template, or else it will redirect.
+
+Required Arguments
+------------------
+
+``request``
+    As always the request object
+
+``calendar_id``
+    This is the calendar id of the event being created or edited.
+
+
+Optional Arguments
+------------------
+
+``template_name``
+    default
+        'events/calendar_by_period.html'
+    
+    This is the template that will be rendered
+
+``event_id``
+    if you are editing an event, you need to pass in the id of the event, so that the form can be pre-populated with the correct information and also so save works correctly
+
+``next``
+    The url to redirect to upon successful completion or edition.
+
+Context Variables
+-----------------
+
+``form``
+    An instance of EventForm to be displayed.
+
+``calendar``
+    A Calendar with id=calendar_id.
+
+delete_event
+============
+
+This view is for deleting events. If the view is accessed via a POST request it will delete the event. If it is accessed via a GET request it will render a template to ask for confirmation.
+
+Required Arguments
+------------------
+
+``request``
+    As always the request object.
+
+``event_id``
+    The id of the event to be deleted.
+
+
+Optional Arguments
+------------------
+
+``template_name``
+    default
+        'events/calendar_by_period.html'
+    
+    This is the template that will be rendered.
+
+``next``
+    The url to redirect to after successful deletion.
+
+``login_required``
+    default
+        ``True``
+    
+    If you want to require a login before deletion happens you can set that here.
+
+Context Variables
+-----------------
+
+``object``
+    The event object to be deleted

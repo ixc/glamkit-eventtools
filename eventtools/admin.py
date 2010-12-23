@@ -13,6 +13,7 @@ def create_occurrence_admin(model_class):
     class OccurrenceAdmin(OccurrenceAdminBase):
         ordering = ('varied_start_date', 'varied_start_time')
         form = create_occurrence_admin_form(model_class)
+        list_display = ('__unicode__', 'full', 'cancelled', 'hide_from_lists')
 
     return OccurrenceAdmin
     
