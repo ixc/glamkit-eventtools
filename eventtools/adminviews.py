@@ -19,21 +19,23 @@ def occurrences(request, id, modeladmin):
     if not occurrences:
         generators = event.generators.all()
         first = event.get_first_occurrence().start
-        last = event.get_last_day()
+        last = event.get_last_occurrence()
         
-        if 'year' in request.GET and 'month' in request.GET:
+        if 'year' in request.GET and 'month' in request.GET: # month is specified by user
             period = Month(generators, datetime.datetime(int(request.GET.get('year')),int(request.GET.get('month')),1))
-        else:
+        else: # we need to give a sane default month
             now = datetime.datetime.now()
-            if first > now:
+            if first > now: # first occurrence is in future
                 period = Month(generators, first)
+            elif last < now: # occurrences are all in past
+                period = Month(generators, last)
             else:
                 period = Month(generators, now)
         hasprev = first < period.start
         if not last:
             hasnext = True
         else:
-            hasnext = last > period.end 
+            hasnext = last > period.end
         occurrences = period.get_even_hidden_occurrences()
     title = _("Select an occurrence to change")
     
