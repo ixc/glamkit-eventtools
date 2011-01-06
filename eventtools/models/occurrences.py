@@ -220,9 +220,15 @@ class OccurrenceBase(models.Model):
     def date_description(self):
         return ugettext("%(day)s, %(time)s") % {
             'day': self.varied_start.strftime('%a, %d %b %Y'),
-            'time': self.varied_start.strftime('%H:%M'),
+            'time': self.varied_start.strftime('%H.%M%p').lower(),
         }
-        
+    
+    def agnsw_calendar_time(self):
+        if self.varied_start.minute:
+            return self.varied_start.strftime('%I.%M%p').lower().lstrip('0')
+        else:
+            return self.varied_start.strftime('%I%p').lower().lstrip('0')
+            
     @property
     def as_icalendar(self):
         """

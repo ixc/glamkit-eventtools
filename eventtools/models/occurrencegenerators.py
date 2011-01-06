@@ -136,7 +136,7 @@ class OccurrenceGeneratorBase(models.Model):
         if self.first_end_date and (self.first_start_date != self.first_end_date):
             result += " to %s" % datetime.datetime.strftime(self.first_end_date, "%A %d %B %Y")
 
-        result += ", %s" % datetime.time.strftime(self.first_start_time, "%I:%M%p").lstrip('0').replace(':00', '')
+        result += ", %s" % datetime.time.strftime(self.first_start_time, "%I.%M%p").lstrip('0').replace(':00', '').lower()
         
         if self.rule:
             result = "%s from %s" % (self.rule, result)
