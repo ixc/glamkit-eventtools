@@ -9,7 +9,7 @@ from eventtools.models.events import EventBase
 
 register = template.Library()
 
-def month_calendar(context, events_pool=[], month=None, show_header=True, selected_start=None, selected_end=None, week_start=0, strip_empty_weeks=None):
+def month_calendar(context, events_pool=[], month=None, show_header=True, selected_start=None, selected_end=None, week_start=0, strip_empty_weeks=None, show_events=True):
     """
     Creates a configurable html calendar displaying one month
     
@@ -57,15 +57,16 @@ def month_calendar(context, events_pool=[], month=None, show_header=True, select
             if selected_end >= day >= selected_start:
                 classes.append('selected')
         events = events_by_date.get(day, [])
-        if events:
-            classes.append("has_events")
-        else:
-            classes.append("no_events")
+        if show_events:
+            if events:
+                classes.append("has_events")
+            else:
+                classes.append("no_events")
         return {'date': day, 'classes': classes, 'events': events}
 
     month_calendar = [map(annotate, week) for week in month_calendar]
 
-    STRIP_EMPTY_WEEKS_OPTIONS = (None, 'leading', 'trailing', 'both')
+    STRIP_EMPTY_WEEKS_OPTIONS = (False, 'leading', 'trailing', 'both')
     if strip_empty_weeks not in STRIP_EMPTY_WEEKS_OPTIONS:
         raise TemplateSyntaxError(
             "strip_empty_weeks argument must be one of %r, not %r" % (
