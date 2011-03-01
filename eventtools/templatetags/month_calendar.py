@@ -58,6 +58,7 @@ def month_calendar(context, events_pool=[], month=None, show_header=True, select
                 classes.append('selected')
         events = events_by_date.get(day, [])
         if show_events:
+            print show_events
             if events:
                 classes.append("has_events")
             else:
@@ -66,7 +67,7 @@ def month_calendar(context, events_pool=[], month=None, show_header=True, select
 
     month_calendar = [map(annotate, week) for week in month_calendar]
 
-    STRIP_EMPTY_WEEKS_OPTIONS = (False, 'leading', 'trailing', 'both')
+    STRIP_EMPTY_WEEKS_OPTIONS = (False, None, 'leading', 'trailing', 'both')
     if strip_empty_weeks not in STRIP_EMPTY_WEEKS_OPTIONS:
         raise TemplateSyntaxError(
             "strip_empty_weeks argument must be one of %r, not %r" % (
