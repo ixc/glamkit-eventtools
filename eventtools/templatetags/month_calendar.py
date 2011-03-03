@@ -58,7 +58,6 @@ def month_calendar(context, events_pool=[], month=None, show_header=True, select
                 classes.append('selected')
         events = events_by_date.get(day, [])
         if show_events:
-            print show_events
             if events:
                 classes.append("has_events")
             else:
