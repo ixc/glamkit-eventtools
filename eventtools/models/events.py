@@ -270,7 +270,7 @@ class EventBase(models.Model):
                 lastoccs.append(generator.repeat_until)
             else:
                 if generator.rule:
-                    return datetime.datetime.max
+                    return datetime.datetime.now() + datetime.timedelta(days=365) # LOOK_AHEAD_TIMEDELTA should be in settings
                 lastoccs.append(generator.end)
             for varied in generator.get_changed_occurrences():
                 lastoccs.append(varied.varied_end)
