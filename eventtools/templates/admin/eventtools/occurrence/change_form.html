@@ -4,8 +4,8 @@
 {% block extrahead %}
 {{ block.super }}
 <script type="text/javascript">
-  $(document).ready(function(){ 
-    $('#add_id__varied_event')[0].href += '?unvaried_event={{ original.unvaried_event.id }}';
+  django.jQuery(document).ready(function(){ 
+    django.jQuery('#add_id__varied_event')[0].href += '?unvaried_event={{ original.unvaried_event.id }}';
   });
 </script>
 {% endblock %}
