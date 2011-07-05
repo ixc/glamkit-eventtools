@@ -283,7 +283,7 @@ class OccurrenceGeneratorBase(models.Model):
         return ONLY a list of exceptional Occurrences.
         """
         
-        exceptional_occurrences = self.occurrences.all()
+        exceptional_occurrences = self.occurrences.order_by('varied_start_date', 'varied_start_time',)
         changed_occurrences = []
         
         for occ in exceptional_occurrences:
