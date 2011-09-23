@@ -267,7 +267,7 @@ class EventBase(models.Model):
         lastoccs = []
         for generator in self.generators.all():
             if generator.repeat_until:
-                lastoccs.append(generator.repeat_until)
+                lastoccs.append(generator.get_occurrences(generator.start, generator.repeat_until)[-1].varied_end)
             else:
                 if generator.rule:
                     return datetime.datetime.max
