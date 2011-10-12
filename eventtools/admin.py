@@ -38,21 +38,22 @@ def _convert_to_oneoff(modeladmin, request, queryset):
 _convert_to_oneoff.short_description = "Make occurrences one-off (and create exclusions)"
 
 
-def EventForm(EventModel):
-    class _EventForm(forms.ModelForm):
-        parent = TreeNodeChoiceField(queryset=EventModel._event_manager.all(), level_indicator=u"-", required=False)
-
-        class Meta:
-            model = EventModel
-
-    return _EventForm
+#def EventForm(EventModel):
+#    class _EventForm(forms.ModelForm):
+#        parent = TreeNodeChoiceField(queryset=EventModel._event_manager.all(), level_indicator=u"-", required=False)
+#
+#        class Meta:
+#            model = EventModel
+#
+#    return _EventForm
 
 def EventAdmin(EventModel, SuperModel=MPTTModelAdmin): #pass in the name of your EventModel subclass to use this admin.
     class _EventAdmin(SuperModel):
-        form = EventForm(EventModel)
+#        form = EventForm(EventModel)
         list_display = ('__unicode__', 'occurrence_link')
         change_form_template = 'admin/eventtools/event.html'
         save_on_top = True
+        exclude = ('parent', )
 
         def __init__(self, *args, **kwargs):
             super(_EventAdmin, self).__init__(*args, **kwargs)
@@ -180,10 +181,11 @@ class DateAndMaybeTimeField(forms.SplitDateTimeField):
 
 def OccurrenceAdmin(OccurrenceModel):
     class _OccurrenceAdmin(admin.ModelAdmin):
-        list_display = ['__unicode__','start','end','event',]
+        list_display = ['start','end','event','edit_link']
         # list_filter = ['event',]
         change_list_template = 'admin/eventtools/occurrence_list.html'
         actions = [_convert_to_oneoff, _remove_occurrences, _wipe_occurrences]
+        exclude = ('generator', 'event')
         formfield_overrides = {
             models.DateTimeField: {'form_class':DateAndMaybeTimeField},
             }
@@ -191,6 +193,7 @@ def OccurrenceAdmin(OccurrenceModel):
         def __init__(self, *args, **kwargs):
             super(_OccurrenceAdmin, self).__init__(*args, **kwargs)
             self.event_model = self.model.event.field.rel.to
+            self.list_display_links = (None,) #have to specify it here to avoid Django complaining
 
         def get_actions(self, request):
             # remove 'delete' action
@@ -198,6 +201,33 @@ def OccurrenceAdmin(OccurrenceModel):
             if 'delete_selected' in actions:
                 del actions['delete_selected']
             return actions
+
+        def edit_link(self, occurrence):
+            if occurrence.generator is not None:
+                change_url = reverse(
+                    '%s:%s_%s_change' % (
+                        self.admin_site.name,
+                        self.event_model._meta.app_label,
+                        self.event_model._meta.module_name),
+                    args=(occurrence.generator.event.id,)
+                )
+                return "via a repeating occurrence in <a href='%s'>%s</a>" % (
+                    change_url,
+                    occurrence.generator.event,
+                )
+            else:
+                change_url = reverse(
+                    '%s:%s_%s_change' % (
+                        self.admin_site.name,
+                        type(occurrence)._meta.app_label,
+                        type(occurrence)._meta.module_name),
+                    args=(occurrence.id,)
+                )
+                return "<a href='%s'>Edit</a>" % (
+                    change_url,
+                )
+        edit_link.short_description = "edit"
+        edit_link.allow_tags = True
 
 
         def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
