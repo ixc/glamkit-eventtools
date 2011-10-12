@@ -58,11 +58,11 @@ class GeneratorModel(models.Model):
                 self.repeat_until < self.event_end:
             raise exceptions.ValidationError(
                 'repeat_until must not be earlier than start')
-        if self.repeat_until is not None and self.rule is None:
+        if self.repeat_until is not None and not self.rule_id:
             raise exceptions.ValidationError(
                 'repeat_until has no effect without a repetition rule')
         # This data entry mistake is common enough to justify a slight hack
-        if self.rule.frequency == 'DAILY' \
+        if self.rule_id and self.rule.frequency == 'DAILY' \
                 and self.event_end - self.event_start > timedelta(1):
             raise exceptions.ValidationError(
                 'Daily events cannot span multiple days; the event start and \
@@ -93,7 +93,7 @@ class GeneratorModel(models.Model):
             raise AttributeError('Repeat_until must not be earlier than start.')
 
         # still need 'if self.rule' for migration
-        if self.rule and self.rule.frequency == 'DAILY' \
+        if self.rule_id and self.rule.frequency == 'DAILY' \
                 and self.event_end - self.event_start > timedelta(1):
             raise AttributeError('Daily events cannot span multiple days; the event start and end dates should be the same.')
         
@@ -123,7 +123,7 @@ class GeneratorModel(models.Model):
         
         if self.pk: #it already exists so could potentially be changed
             saved_self = type(self).objects.get(pk=self.pk)
-            if self.rule == saved_self.rule:
+            if self.rule_id == saved_self.rule_id:
                 start_shift = self.event_start - saved_self.event_start
                 end_shift = self.event_end - saved_self.event_end
                 duration = self.event_duration
@@ -190,7 +190,7 @@ class GeneratorModel(models.Model):
         return
 
     def generate_dates(self):
-        if self.rule is None: #still need for migration
+        if not self.rule_id: #still need for migration
             yield self.event_start
             raise StopIteration
 
@@ -210,7 +210,7 @@ class GeneratorModel(models.Model):
         """
         generate my occurrences
         """
-        if self.rule is None: #still need for migration
+        if not self.rule_id: #still need for migration
             self.create_occurrence(start=self.event_start, end=self.event_end, honour_exceptions=True)
             return
 
