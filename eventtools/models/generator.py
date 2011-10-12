@@ -91,11 +91,8 @@ class GeneratorModel(models.Model):
 
         if self.repeat_until is not None and self.repeat_until < self.event_start:
             raise AttributeError('Repeat_until must not be earlier than start.')
-        
-        if self.repeat_until is not None and self.rule is None:
-            raise AttributeError('Repeat_until has no effect without a repetition rule.')
-        
-        if self.rule.frequency == 'DAILY' \
+
+        if self.rule and self.rule.frequency == 'DAILY' \ # still need 'if self.rule' for migration
                 and self.event_end - self.event_start > timedelta(1):
             raise AttributeError('Daily events cannot span multiple days; the event start and end dates should be the same.')
         
@@ -192,6 +189,11 @@ class GeneratorModel(models.Model):
         return
 
     def generate_dates(self):
+        if self.rule is None: #still need for migration
+            yield self.event_start
+            raise StopIteration
+
+
         rule = self.rule.get_rrule(dtstart=self.event_start)
         date_iter = iter(rule)
         drop_dead_date = self.repeat_until or datetime.now() + settings.DEFAULT_GENERATOR_LIMIT
@@ -207,6 +209,9 @@ class GeneratorModel(models.Model):
         """
         generate my occurrences
         """
+        if self.rule is None: #still need for migration
+            self.create_occurrence(start=self.event_start, end=self.event_end, honour_exceptions=True)
+            return
 
         event_duration = self.event_duration
         for o_start in self.generate_dates():
