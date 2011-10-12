@@ -3,3 +3,4 @@ from .event import *
 from .occurrence import *
 from .generator import *
 from .rule import *
+from .exclusion import *

@@ -256,16 +256,13 @@ class EventModel(MPTTModel):
     class Meta:
         abstract = True
     
-    def update_endless_generators(self):
-    
-        
+    def update_generators(self):
         if hasattr(self, 'generators'):
-            endless_generators = self.generators.filter(rule__isnull=False, repeat_until__isnull=True)
-            [g.generate() for g in endless_generators]
+            [g.generate() for g in self.generators.all()]
     
     def save(self, *args, **kwargs):
         self.cascade_changes_to_children()
-        self.update_endless_generators()
+        self.update_generators()
         return super(EventModel, self).save(*args, **kwargs)
                 
     @classmethod

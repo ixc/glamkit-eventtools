@@ -21,6 +21,26 @@ ins {
 -moz-background-origin:padding;
 background:#BBFFBB none repeat scroll 0 0;
 }
+
+#occurrences-group h2:before {
+	content:"One-off ";
+}
+
+/* hide inlines text */
+#occurrences-group td.original p,
+#exclusions-group td.original p,
+#generators-group td.original p {
+	display: none;
+}
+
+#occurrences-group tr.has_original td,
+#exclusions-group tr.has_original td,
+#generators-group tr.has_original td {
+	padding-top: 0;
+}
+
+
+
 </style>
 {% endblock %}
 

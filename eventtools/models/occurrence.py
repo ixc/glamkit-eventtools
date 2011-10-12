@@ -379,12 +379,13 @@ class OccurrenceModel(models.Model):
     __metaclass__ = OccurrenceModelBase
     start = models.DateTimeField(db_index=True)
     end = models.DateTimeField(blank=True, db_index=True)
-        
+
     objects = OccurrenceManager()
     
     class Meta:
         abstract = True
         ordering = ('start', 'end',)
+        unique_together = ('event', 'start')
 
     def clean(self):
         if self.end is None:
@@ -406,11 +407,11 @@ class OccurrenceModel(models.Model):
         if self.start > self.end:
             raise AttributeError('start must be earlier than end')
         
-        #if my time is being changed, or if i'm being detached from the generator, add the old time to the generator's exceptions.
+        #if i'm being detached from the generator, add the old time to the generator's exceptions.
         #TODO: add the new time if self.start is in exceptions and durations are equal
         if hasattr(self, 'generator') and self.pk:
             saved_self = type(self).objects.get(pk=self.pk)
-            if self.generator != saved_self.generator or self.start != saved_self.start or self.end != saved_self.end:
+            if self.generator != saved_self.generator:
                 saved_self.generator.add_exception(saved_self.start)
 
             if self.generator is not None and self.generator.is_exception(self.start):
