@@ -92,7 +92,8 @@ class GeneratorModel(models.Model):
         if self.repeat_until is not None and self.repeat_until < self.event_start:
             raise AttributeError('Repeat_until must not be earlier than start.')
 
-        if self.rule and self.rule.frequency == 'DAILY' \ # still need 'if self.rule' for migration
+        # still need 'if self.rule' for migration
+        if self.rule and self.rule.frequency == 'DAILY' \
                 and self.event_end - self.event_start > timedelta(1):
             raise AttributeError('Daily events cannot span multiple days; the event start and end dates should be the same.')
         
