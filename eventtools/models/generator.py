@@ -35,15 +35,16 @@ class GeneratorModel(models.Model):
     """
 
     #define a field called 'event' in the subclass
-    event_start = models.DateTimeField(db_index=True)
-    event_end = models.DateTimeField(blank=True, db_index=True)
-    rule = models.ForeignKey(Rule, verbose_name=_(u"repetition rule"), null = True, blank = True, help_text=_(u"Select '----' for a one-off event."))
-    repeat_until = models.DateTimeField(null = True, blank = True, help_text=_(u"These start dates are ignored for one-off events."))
+    event_start = models.DateTimeField(db_index=True, help_text="Enter the start time for the FIRST occurrence")
+    event_end = models.DateTimeField(blank=True, db_index=True, help_text="Enter the end time for the FIRST occurrence")
+    rule = models.ForeignKey(Rule, verbose_name=_(u"repetition rule"), null = True, blank = True, help_text=_(u"How often does the event repeat?"))
+    repeat_until = models.DateTimeField(null = True, blank = True, help_text=_(u"The event will repeat until this time (inclusive)"))
     exceptions = JSONField(null=True, blank=True, help_text=_(u"These dates are skipped by the generator."), default={})
     
     class Meta:
         abstract = True
         ordering = ('event_start',)
+        verbose_name = "repeating occurrence"
 
     def __unicode__(self):
         return u"%s, %s" % (self.event, self.robot_description())

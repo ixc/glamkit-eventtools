@@ -253,7 +253,7 @@ def OccurrenceAdmin(OccurrenceModel):
 def GeneratorInline(GeneratorModel):
     class _GeneratorInline(admin.TabularInline):
         model = GeneratorModel
-        extra = 1
+        extra = 0
         formfield_overrides = {
             models.DateTimeField: {'form_class': DateAndMaybeTimeField},
             }        
