@@ -47,7 +47,6 @@ background:#BBFFBB none repeat scroll 0 0;
 {% block object-tools-items %}
   {{ block.super }}
   {% if original and object.id %}
-    <li><a href="create_variation/">Create a variation of this event</a></li>
 		<li><a href="{{ occurrences_url }}">View all occurrences ({{ object.occurrences.count }})</a></li>
   {% endif %}
 {% endblock %}

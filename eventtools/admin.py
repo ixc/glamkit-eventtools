@@ -332,15 +332,16 @@ def OccurrenceInline(OccurrenceModel):
             }
     return _OccurrenceInline
 
-def ExclusionInline(ExclusionModel):
-    class _ExclusionInline(admin.TabularInline):
-        model = ExclusionModel
-        extra = 0
-        fields = ('start',)
-        formfield_overrides = {
-            models.DateTimeField: {'form_class': DateAndMaybeTimeField},
-            }
-    return _ExclusionInline
+# Decided not to show this - too much of an abstraction - and insist that people just delete occurrences they don't want.
+#def ExclusionInline(ExclusionModel):
+#    class _ExclusionInline(admin.TabularInline):
+#        model = ExclusionModel
+#        extra = 0
+#        fields = ('start',)
+#        formfield_overrides = {
+#            models.DateTimeField: {'form_class': DateAndMaybeTimeField},
+#            }
+#    return _ExclusionInline
 
 def GeneratorInline(GeneratorModel):
     class _GeneratorInline(admin.TabularInline):
