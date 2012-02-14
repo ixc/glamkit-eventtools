@@ -3,7 +3,7 @@ from operator import itemgetter
 from django.db import models
 from django.db.models.base import ModelBase
 from django.db.models.fields import FieldDoesNotExist
-from django.db.models import Count
+from django.db.models import Count, signals
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django.template.defaultfilters import urlencode
@@ -245,6 +245,8 @@ class EventModelBase(MPTTModelBase):
             #override the treemanager with self too, so we don't need to recast all querysets
             manager.contribute_to_class(cls, cls._mptt_meta.tree_manager_attr)
             setattr(cls, '_tree_manager', getattr(cls, cls._mptt_meta.tree_manager_attr))
+            
+            signals.pre_delete.connect(cls._pre_delete, sender=cls)
 
         return cls
 
@@ -264,7 +266,13 @@ class EventModel(MPTTModel):
         self.cascade_changes_to_children()
         self.update_generators()
         return super(EventModel, self).save(*args, **kwargs)
-                
+    
+    @staticmethod #connected in the metaclass
+    def _pre_delete(sender, **kwargs):
+        instance = kwargs['instance']
+        if hasattr(instance, 'exclusions'):
+            instance.exclusions.all().delete()
+    
     @classmethod
     def Occurrence(cls):
         return cls.occurrences.related.model
