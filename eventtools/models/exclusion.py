@@ -21,7 +21,7 @@ class ExclusionModel(models.Model):
         unique_together = ('event', 'start')
 
     def __unicode__(self):
-        return "%s starting on %s is excluded" % (self.event, self.start)
+        return u"%s starting on %s is excluded" % (self.event, self.start)
 
     def save(self, *args, **kwargs):
         """
