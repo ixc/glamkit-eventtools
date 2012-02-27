@@ -6,7 +6,7 @@ from django.core import exceptions
 
 from dateutil import rrule
 
-from rule import Rule
+from rule import Rule, FREQUENCY_TIME_MAP
 
 from nosj.fields import JSONField
 
@@ -61,13 +61,12 @@ class GeneratorModel(models.Model):
         if self.repeat_until is not None and self.rule is None:
             raise exceptions.ValidationError(
                 'repeat_until has no effect without a repetition rule')
-        # This data entry mistake is common enough to justify a slight hack
-        if self.rule and self.rule.frequency == 'DAILY' \
-                and self.event_end - self.event_start > timedelta(1):
-            raise exceptions.ValidationError(
-                'Daily events cannot span multiple days; the event start and \
-                end dates should be the same.'
-            )
+        if self.rule and self.rule.frequency in FREQUENCY_TIME_MAP \
+                and self.event_end - self.event_start \
+                > FREQUENCY_TIME_MAP[self.rule.frequency]:
+            raise exceptions.ValidationError('The event timespan is longer '
+                'than the repetition frequency. The "repeat until" date may '
+                'have been mistakenly used as the "event end".')
         super(GeneratorModel, self).clean()
 
 
@@ -95,9 +94,12 @@ class GeneratorModel(models.Model):
         if self.repeat_until is not None and self.rule is None:
             raise AttributeError('Repeat_until has no effect without a repetition rule.')
         
-        if self.rule and self.rule.frequency == 'DAILY' \
-                and self.event_end - self.event_start > timedelta(1):
-            raise AttributeError('Daily events cannot span multiple days; the event start and end dates should be the same.')
+        if self.rule and self.rule.frequency in FREQUENCY_TIME_MAP \
+                and self.event_end - self.event_start \
+                > FREQUENCY_TIME_MAP[self.rule.frequency]:
+            raise AttributeError('The event timespan is longer than the '
+                'repetition frequency. The "repeat until" date may have been '
+                'mistakenly used as the "event end".')
         
         """
         When you change a generator and save it, it updates its existing occurrences according to the following:

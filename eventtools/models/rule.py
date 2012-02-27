@@ -1,14 +1,26 @@
-from django.db import models
-from django.utils.translation import ugettext, ugettext_lazy as _
+from datetime import timedelta
 from dateutil import rrule
 
-freqs = (
-    ("YEARLY", _("Yearly")),
-    ("MONTHLY", _("Monthly")),
-    ("WEEKLY", _("Weekly")),
-    ("DAILY", _("Daily")),
-    ("HOURLY", _("Hourly")),
+from django.db import models
+from django.utils.translation import ugettext, ugettext_lazy as _
+
+
+# The deltas don't need to be particularly precise, the minimum length will do
+FREQUENCIES = (
+    ("YEARLY", _("Yearly"), timedelta(365)),
+    ("MONTHLY", _("Monthly"), timedelta(28)),
+    ("WEEKLY", _("Weekly"), timedelta(7)),
+    ("DAILY", _("Daily"), timedelta(1)),
+    ("HOURLY", _("Hourly"), timedelta(hours=1)),
 )
+
+# The first two columns of the above to use as field choices
+FREQUENCY_CHOICES = zip(*zip(*FREQUENCIES)[:2])
+# A mapping of field value to corresponding minimum timespan
+FREQUENCY_TIME_MAP = dict((f[0], f[2]) for f in FREQUENCIES)
+# For backwards compatibility
+freqs = FREQUENCY_CHOICES
+
 
 class Rule(models.Model):
     """
@@ -40,7 +52,7 @@ class Rule(models.Model):
     """
     name = models.CharField(_("name"), max_length=100, help_text=_("a short friendly name for this repetition."))
     common = models.BooleanField(help_text=_("common rules appear at the top of the list."))
-    frequency = models.CharField(_("frequency"), choices=freqs, max_length=10, blank=True, help_text=_("the base repetition period."))
+    frequency = models.CharField(_("frequency"), choices=FREQUENCY_CHOICES, max_length=10, blank=True, help_text=_("the base repetition period."))
     params = models.TextField(_("inclusion parameters"), blank=True, help_text=_("extra params required to define this type of repetition."))
     complex_rule = models.TextField(_("complex rules"), help_text=_("over-rides all other settings."), blank=True)
 
