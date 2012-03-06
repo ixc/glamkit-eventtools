@@ -372,7 +372,8 @@ class OccurrenceModel(models.Model):
     """
     An abstract model for an event occurrence.
     
-    Implementing subclasses should define 'event' ForeignKey to an EventModel subclass. The related_name for the ForeignKey should be 'occurrences'.
+    Implementing subclasses should define 'event' ForeignKey to an EventModel 
+    subclass. The related_name for the ForeignKey should be 'occurrences'.
 
     event = models.Foreignkey(SomeEvent, related_name="occurrences")
     """
@@ -406,14 +407,19 @@ class OccurrenceModel(models.Model):
         if self.start > self.end:
             raise AttributeError('start must be earlier than end')
         
-        #if my time is being changed, or if i'm being detached from the generator, add the old time to the generator's exceptions.
-        #TODO: add the new time if self.start is in exceptions and durations are equal
+        # If my time is being changed, or if i'm being detached from the
+        # generator, add the old time to the generator's exceptions.
+        # TODO: add the new time if self.start is in exceptions and durations
+        # are equal
         if hasattr(self, 'generator') and self.pk:
             saved_self = type(self).objects.get(pk=self.pk)
-            if self.generator != saved_self.generator or self.start != saved_self.start or self.end != saved_self.end:
+            generator_changed = self.generator != saved_self.generator
+            if saved_self.generator \
+                    and generator_changed \
+                    or saved_self.generator.event_duration != self.duration:
                 saved_self.generator.add_exception(saved_self.start)
 
-            if self.generator is not None and self.generator.is_exception(self.start):
+            if self.generator and self.generator.is_exception(self.start):
                 if self.duration == self.generator.event_duration:
                     self.generator.remove_exception(self.start)
 
