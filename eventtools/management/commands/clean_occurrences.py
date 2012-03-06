@@ -68,3 +68,27 @@ class Command(LabelCommand):
                             occurrence.end = occurrence.end.replace(
                                 *occurrence.start.timetuple()[:3])
                             Model.save(occurrence)
+            # Check for duplicates
+            deleted_pks = []
+            duplicates = 0
+            for occurrence in generator.occurrences.all():
+                if not generator.exceptions \
+                        or not generator.exceptions.has_key(
+                            occurrence.start.isoformat()) \
+                        and not occurrence.pk in deleted_pks:
+                    possible_duplicates = generator.occurrences.filter(
+                        start=occurrence.start, end=occurrence.end).exclude(
+                            pk=occurrence.pk)
+                    if possible_duplicates:
+                        for duplicate in possible_duplicates:
+                            if not generator.exceptions \
+                                    or not generator.exceptions.has_key(
+                                        duplicate.start.isoformat()):
+                                duplicates += 1
+                                deleted_pks += [duplicate.pk]
+                                if not dry_run:
+                                    duplicate.generator = None
+                                    duplicate.delete()
+            if verbosity and duplicates:
+                print 'Generator "%s" has %s duplicate occurrences.' % (
+                    generator, duplicates)
