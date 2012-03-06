@@ -1,3 +1,3 @@
 from models import *
-from utils import *
+from test_utilities import *
 from views import *
