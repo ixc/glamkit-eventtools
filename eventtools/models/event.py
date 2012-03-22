@@ -260,7 +260,14 @@ class EventModel(MPTTModel):
     
     def update_generators(self):
         if hasattr(self, 'generators'):
-            [g.generate() for g in self.generators.all()]
+            endless_generators = self.generators.all()
+            for generator in endless_generators:
+                # An AttributeError usually means that the generator fails
+                # validation. There's no need to stop the event from saving.
+                try:
+                    generator.generate()
+                except AttributeError:
+                    pass
     
     def save(self, *args, **kwargs):
         self.cascade_changes_to_children()

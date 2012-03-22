@@ -1,13 +1,16 @@
 # -*- coding: utf-8“ -*-
+from datetime import date, time, datetime, timedelta
+from dateutil.relativedelta import relativedelta
+
+from django.core.urlresolvers import reverse
 from django.test import TestCase
+
+from eventtools.models import Rule
+from eventtools.tests._fixture import generator_fixture
 from eventtools.tests._inject_app import TestCaseWithApp as AppTestCase
 from eventtools.tests.eventtools_testapp.models import *
-from datetime import date, time, datetime, timedelta
-from eventtools.tests._fixture import generator_fixture
 from eventtools.utils import datetimeify
-from dateutil.relativedelta import relativedelta
-from django.core.urlresolvers import reverse
-from eventtools.models import Rule
+
 
 class TestGenerators(AppTestCase):
     
@@ -241,11 +244,10 @@ class TestGenerators(AppTestCase):
         When you change a generator and save it, it updates existing occurrences according to the following:
         
         * If a repetition rule was changed:
-            don't try to update occurrences, but run generate() to make the new occurrences.
+            delete occurrences that don't conform to the new rule
+        
         * If a repeat_until rule was changed:
-            don't try to delete out-of-bounds occurrences, but run generate() to make the new occurrences.
-            out-of-bounds occurrences are left behind.
-            ie do nothing special :-)
+            delete out-of-bounds occurrences
             
         * If start date (or datetime) was changed:
             run the old rule, and timeshift all occurrences produced by the old rule.
@@ -262,26 +264,37 @@ class TestGenerators(AppTestCase):
         
                 
         # let's change the timing and rule. The existing occurrences should be untouched.
-        self._reset_generator_changes()
         daily = Rule.objects.create(frequency = "DAILY")
-        self.changeable_generator.event_start=datetime(2010, 9, 30, 10, 30)
-        self.changeable_generator.rule=daily
-        self.changeable_generator.save()    
+        self.bin_night.occurrences.all().delete()
+        self.changeable_generator = self.bin_night.generators.create(
+            event_start=datetime(2010, 10, 1, 8, 30),
+            event_end=datetime(2010, 10, 1, 9, 30),
+            rule=daily,
+            repeat_until=datetime(2010, 10, 8)
+        )
+        self.ae(self.changeable_generator.occurrences.count(), 8)
+        self.ae(self.changeable_generator.exceptions, {})
+        first_id = self.changeable_generator.occurrences.all()[0].pk
+        last_id = self.changeable_generator.occurrences.all()[7].pk
+        self.changeable_generator.event_start = datetime(2010, 10, 1, 7, 30)
+        self.changeable_generator.rule=self.weekly
+        self.changeable_generator.save()  
         new_occurrences = list(self.changeable_generator.occurrences.all())
-        self.ae(len(new_occurrences), 12)
-        for occ in self.normal_occurrences: #forget the freak one
-            self.assertTrue(occ in new_occurrences)
-            o = self.changeable_generator.occurrences.get(id=occ.id)
-            self.ae(o.start.time(), time(8,30))
-            self.ae(o.end.time(), time(9,30))
+        # Verify that the old occurrences have been modified without deletion
+        self.ae(len(new_occurrences), 2)
+        self.ae(new_occurrences[0].pk, first_id)
+        self.ae(new_occurrences[1].pk, last_id)
+        # And make sure the time change has in fact propagated
+        for occ in new_occurrences:
+            self.ae(occ.start.time(), time(7, 30))
         
         # let's change the repeat_until rule to earlier. Nothing should be deleted.
         self._reset_generator_changes()
         self.changeable_generator.repeat_until = date(2010, 10, 1)
         self.changeable_generator.save()
         new_occurrences = list(self.changeable_generator.occurrences.all())
-        self.ae(len(new_occurrences), 3)
-        for occ in self.original_occurrences:
+        self.ae(len(new_occurrences), 2)
+        for occ in self.original_occurrences[:2]:
             self.assertTrue(occ in new_occurrences)
         
         #let's change the start date/time

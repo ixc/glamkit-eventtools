@@ -6,7 +6,7 @@ from django.core import exceptions
 
 from dateutil import rrule
 
-from rule import Rule
+from rule import Rule, FREQUENCY_TIME_MAP
 
 from nosj.fields import JSONField
 
@@ -61,13 +61,12 @@ class GeneratorModel(models.Model):
         if self.repeat_until is not None and not self.rule_id:
             raise exceptions.ValidationError(
                 'repeat_until has no effect without a repetition rule')
-        # This data entry mistake is common enough to justify a slight hack
-        if self.rule_id and self.rule.frequency == 'DAILY' \
-                and self.event_end - self.event_start > timedelta(1):
-            raise exceptions.ValidationError(
-                'Daily events cannot span multiple days; the event start and \
-                end dates should be the same.'
-            )
+        if self.rule and self.rule.frequency in FREQUENCY_TIME_MAP \
+                and self.event_end - self.event_start \
+                > FREQUENCY_TIME_MAP[self.rule.frequency]:
+            raise exceptions.ValidationError('The event timespan is longer '
+                'than the repetition frequency. The "repeat until" date may '
+                'have been mistakenly used as the "event end".')
         super(GeneratorModel, self).clean()
 
 
@@ -92,21 +91,24 @@ class GeneratorModel(models.Model):
         if self.repeat_until is not None and self.repeat_until < self.event_start:
             raise AttributeError('Repeat_until must not be earlier than start.')
 
-        # still need 'if self.rule' for migration
-        if self.rule_id and self.rule.frequency == 'DAILY' \
-                and self.event_end - self.event_start > timedelta(1):
-            raise AttributeError('Daily events cannot span multiple days; the event start and end dates should be the same.')
+        if self.repeat_until is not None and self.rule is None:
+            raise AttributeError('Repeat_until has no effect without a repetition rule.')
+        
+        if self.rule and self.rule.frequency in FREQUENCY_TIME_MAP \
+                and self.event_end - self.event_start \
+                > FREQUENCY_TIME_MAP[self.rule.frequency]:
+            raise AttributeError('The event timespan is longer than the '
+                'repetition frequency. The "repeat until" date may have been '
+                'mistakenly used as the "event end".')
         
         """
         When you change a generator and save it, it updates its existing occurrences according to the following:
         
         * If a repetition rule was changed:
-            don't try to update occurrences, but run generate() to make the new occurrences.
-            ie don't update anything, just generate
+            delete occurrences that don't conform to the new rule.
+            
         * If a repeat_until rule was changed:
-            don't try to delete out-of-bounds occurrences, but run generate() to make the new occurrences.
-            out-of-bounds occurrences are left behind.
-            ie update as normal
+            delete out-of-bounds occurrences.
             
         * If start date (or datetime) was changed:
             run the old rule, and timeshift all occurrences produced by the old rule.
@@ -123,35 +125,53 @@ class GeneratorModel(models.Model):
         
         if self.pk: #it already exists so could potentially be changed
             saved_self = type(self).objects.get(pk=self.pk)
-            if self.rule_id == saved_self.rule_id:
-                start_shift = self.event_start - saved_self.event_start
-                end_shift = self.event_end - saved_self.event_end
-                duration = self.event_duration
 
-                if start_shift:
-                    if self.event_start.date() != saved_self.event_start.date(): # we're shifting days (and times)
-                        occurrence_set = self.occurrences.filter(start__in=list(saved_self.generate_dates()))
-                    elif self.event_start.time() != saved_self.event_start.time(): #we're only shifting times
-                        occurrence_set = [o for o in self.occurrences.all() if o.start.time() == saved_self.event_start.time()]
-                    
-                    if start_shift > timedelta(0):
-                        occurrence_set = reversed(occurrence_set)
-                    
-                    for occ in occurrence_set:
-                        occ.start += start_shift
-                        occ.end = occ.start + duration
-                        occ.save()
+            start_shift = self.event_start - saved_self.event_start
+            end_shift = self.event_end - saved_self.event_end
+            duration = self.event_duration
 
-                elif end_shift: #only end has changed (both is covered above)            
-                    if self.event_end.date() != saved_self.event_end.date(): # we're shifting days (and times)
-                        occurrence_set = self.occurrences.filter(start__in=list(self.generate_dates()))
-                    elif self.event_end.time() != saved_self.event_end.time(): #we're only shifting times
-                        occurrence_set = [o for o in self.occurrences.all() if o.end.time() == saved_self.event_end.time()]
-                    
-                    for occ in occurrence_set:
-                        occ.end += end_shift
+            if start_shift:
+                if self.event_start.date() != saved_self.event_start.date(): # we're shifting days (and times)
+                    occurrence_set = self.occurrences.filter(start__in=list(saved_self.generate_dates()))
+                elif self.event_start.time() != saved_self.event_start.time(): #we're only shifting times
+                    occurrence_set = [o for o in self.occurrences.all() if o.start.time() == saved_self.event_start.time()]
+
+                if start_shift > timedelta(0):
+                    occurrence_set = reversed(occurrence_set)
+
+                for occ in occurrence_set:
+                    occ.start += start_shift
+                    occ.end = occ.start + duration
+                    if self.repeat_until and occ.start < self.repeat_until:
                         occ.save()
+                    else:
+                        occ.delete()
+
+            elif end_shift: #only end has changed (both is covered above)            
+                if self.event_end.date() != saved_self.event_end.date(): # we're shifting days (and times)
+                    occurrence_set = self.occurrences.filter(start__in=list(self.generate_dates()))
+                elif self.event_end.time() != saved_self.event_end.time(): #we're only shifting times
+                    occurrence_set = [o for o in self.occurrences.all() if o.end.time() == saved_self.event_end.time()]
                 
+                for occ in occurrence_set:
+                    occ.end += end_shift
+                    if occ.end < occ.start:
+                        # Something has gone wrong, let's do the only sane
+                        # thing to do
+                        occ.end = occ.start + duration
+                    occ.save()
+            
+            if self.repeat_until and (
+                    not saved_self.repeat_until or
+                    self.repeat_until < saved_self.repeat_until):
+                self.occurrences.filter(start__gt=self.repeat_until).delete()
+            
+            # If the rule has changed, delete occurrences that don't conform
+            # to the new rule
+            if self.rule != saved_self.rule:
+                for occurrence in self.occurrences.exclude(start__in=list(self.generate_dates())):
+                    if not self.is_exception(occurrence.start):
+                        occurrence.delete()
 
         super(GeneratorModel, self).save(*args, **kwargs)
         if generate:
@@ -241,10 +261,8 @@ class GeneratorModel(models.Model):
             return [(occ.start, occ.end, u'') for occ in self.occurrences.all()]
 
     def is_exception(self, dt):
-        if self.event.exclusions.filter(start=dt).count():
-            return True
-        return False
-
+        self.event.exclusions.filter(start=dt).exists()
+    
     def add_exception(self, dt):
         self.event.exclusions.get_or_create(start=dt)
 
