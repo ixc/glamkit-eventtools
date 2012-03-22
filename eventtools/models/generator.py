@@ -133,7 +133,10 @@ class GeneratorModel(models.Model):
                         occurrence_set = self.occurrences.filter(start__in=list(saved_self.generate_dates()))
                     elif self.event_start.time() != saved_self.event_start.time(): #we're only shifting times
                         occurrence_set = [o for o in self.occurrences.all() if o.start.time() == saved_self.event_start.time()]
-
+                    
+                    if start_shift > timedelta(0):
+                        occurrence_set = reversed(occurrence_set)
+                    
                     for occ in occurrence_set:
                         occ.start += start_shift
                         occ.end = occ.start + duration
