@@ -415,9 +415,8 @@ class OccurrenceModel(models.Model):
         if hasattr(self, 'generator') and self.pk:
             saved_self = type(self).objects.get(pk=self.pk)
             generator_changed = self.generator != saved_self.generator
-            if saved_self.generator \
-                    and generator_changed \
-                    or saved_self.generator.event_duration != self.duration:
+            if saved_self.generator and (generator_changed
+                    or saved_self.generator.event_duration != self.duration):
                 saved_self.generator.add_exception(saved_self.start)
 
             if self.generator and self.generator.is_exception(self.start):
