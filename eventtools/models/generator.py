@@ -61,7 +61,7 @@ class GeneratorModel(models.Model):
         if self.repeat_until is not None and not self.rule_id:
             raise exceptions.ValidationError(
                 'repeat_until has no effect without a repetition rule')
-        if self.rule and self.rule.frequency in FREQUENCY_TIME_MAP \
+        if self.rule_id and self.rule.frequency in FREQUENCY_TIME_MAP \
                 and self.event_end - self.event_start \
                 > FREQUENCY_TIME_MAP[self.rule.frequency]:
             raise exceptions.ValidationError('The event timespan is longer '
