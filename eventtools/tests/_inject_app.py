@@ -21,7 +21,10 @@ class TestCaseWithApp(TestCase):
         self.__class__.__module__ = self.__class__.__name__
 
         self.old_INSTALLED_APPS = settings.INSTALLED_APPS
-        settings.INSTALLED_APPS += [APP_NAME]
+        if isinstance(settings.INSTALLED_APPS, tuple):
+            settings.INSTALLED_APPS += (APP_NAME,)
+        else:
+            settings.INSTALLED_APPS += [APP_NAME]
         self._old_root_urlconf = settings.ROOT_URLCONF
         settings.ROOT_URLCONF = '%s.urls' % APP_NAME
         load_app(APP_NAME)
