@@ -110,7 +110,7 @@ class Rule(models.Model):
                 .replace("%-nthday%", "%s%s" % (minus_n, weekday))
             try:
                 return rrule.rrulestr(str(cr), dtstart=dtstart)
-            except: #Except what?
+            except ValueError: # eg. unsupported property 
                 pass
         params = self.get_params()
         frequency = 'rrule.%s' % self.frequency
