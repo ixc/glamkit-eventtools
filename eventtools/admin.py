@@ -237,6 +237,10 @@ def EventAdmin(EventModel, SuperModel=MPTTModelAdmin, show_exclusions=False):
         change_form_template = 'admin/eventtools/event.html'
         save_on_top = True
         prepopulated_fields = {'slug': ('title', )}
+        search_fields = ('title',)
+
+#        def queryset(self, request):
+#             return EventModel.objects.annotate(occurrence_count=Count('occurrences'))
 
         def append_eventtools_inlines(self, inline_instances):
             eventtools_inlines = [
@@ -288,10 +292,7 @@ def EventAdmin(EventModel, SuperModel=MPTTModelAdmin, show_exclusions=False):
                 )
 
         def occurrence_link(self, event):
-            try:
-                count = event.occurrences_in_listing().count()
-            except:
-                import pdb; pdb.set_trace()
+            count = event.occurrences_in_listing().count()
             direct_count = event.occurrences.count()
 
             url = self.occurrence_edit_url(event)
