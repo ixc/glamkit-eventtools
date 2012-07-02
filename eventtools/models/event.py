@@ -207,7 +207,9 @@ class EventModelBase(MPTTModelBase):
 class EventModel(MPTTModel):
     __metaclass__ = EventModelBase
     
-    parent = models.ForeignKey('self', null=True, blank=True, related_name='children')
+    parent = models.ForeignKey('self',
+        null=True, blank=True, related_name='children',
+        help_text="Which event is this event derived from. Use the 'create a variation' on the parent event to inherit the parent's information.")
     # 'parent' is more flexible than 'template'.
     title = models.CharField(max_length=255)
     slug = models.SlugField("URL name", unique=True, help_text="This is used in\
