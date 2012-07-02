@@ -337,7 +337,9 @@ class EventModel(MPTTModel):
         
     def is_finished(self):
         """ the event has finished if the closing occurrence has finished. """
-        return self.closing_occurrence().is_finished()
+        closing_occurrence = self.closing_occurrence()
+        if closing_occurrence:
+            return closing_occurrence.is_finished()
 
     def listed_under(self):
         """
