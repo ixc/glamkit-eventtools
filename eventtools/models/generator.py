@@ -167,7 +167,15 @@ class GeneratorModel(XTimespanModel):
         duration_changed = self._duration != saved_self._duration
 
         if start_shift or duration_changed:
-            for o in self.occurrences.all():
+            # Update occurrences in opposite direction to the adjustment of the
+            # 'start' field, to avoid updating an occurrence to clash with an
+            # existing one's (event_id, start) DB uniqueness constraint (#606)
+            if start_shift.total_seconds() >= 0:
+                start_order_by = '-start'  # Moving to future, start from latest
+            else:
+                start_order_by = 'start'  # Moving to past, start from earliest
+
+            for o in self.occurrences.order_by(start_order_by):
                 o.start += start_shift
                 o._duration = self._duration
                 o.save()
