@@ -1,0 +1,36 @@
+{% block content %}
+
+{% regroup occurrence_pool by start_date as day_list %}
+
+<div class="signage">
+	<ul class="days">
+		{% for day in day_list %}
+		<li class="day">
+			<h2>What's On{% if is_today %} Today{% endif %}: {{ day.grouper|date:"l j F" }}</h2>
+			<ul class="events">
+				{% regroup day.list by html_time_description as occurrences_grouped %}
+				{% for occurrence_group in occurrences_grouped %}
+				<li>{{ occurrence_group.grouper }}</li>
+				<ul class="occurrences">
+					{% for occurrence in occurrence_group.list %}
+					<li class="occurrence">
+						<span class="vevent">
+							{% with occurrence.event as event %}
+							<p>{{ event.type }}{% if event.title %} – {{ event.title }}{% endif %}</p>
+							<p>{{ event.subtitle }}</p>
+							<p>{{ event.venue }}{% if event.venue.location %} – {{ event.venue.location }}{% endif %}</p>
+							{% endwith %}
+						</span>
+					</li>
+					{% endfor %}
+				</ul>
+				{% endfor %}
+			</ul>
+		</li>
+		{% empty %}
+		<li>No events</li>
+		{% endfor %}
+	</ul>
+</div>
+
+{% endblock %}

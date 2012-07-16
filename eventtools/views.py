@@ -37,6 +37,9 @@ class EventViews(object):
         return (
             patterns('',
                 url(r'^$', self.index, name='index'),
+                url(r'^signage/$', self.signage, name='signage'),
+                url(r'^signage/(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<day>\d{1,2})/$',
+                    self.signage_on_date, name='signage_on_date'),
                 url(r'^(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', self.on_date, name='on_date'),
                 url(r'^(?P<event_slug>[-\w]+)/$', self.event, name='event'),
                 url(r'^(?P<event_slug>[-\w]+)/(?P<occurrence_pk>[\d]+)/$', self.occurrence, name='occurrence'),
@@ -121,11 +124,35 @@ class EventViews(object):
         context['day'] = day
         context['occurrence_qs'] = self.occurrence_qs
         return render_to_response(template, context)
-        
+
+    def today(self, request):
+        today = datetime.date.today()
+        return self.on_date(request, today.year, today.month, today.day)
+
+    def signage(self, request):
+        """
+        Render a signage view of events that occur today.
+        """
+        today = datetime.date.today()
+        return self.signage_on_date(request, today.year, today.month, today.day)
+
+    def signage_on_date(self, request, year, month, day):
+        """
+        Render a signage view of events that occur on a given day.
+        """
+        template = 'eventtools/signage_on_date.html'
+        dt = datetime.date(int(year), int(month), int(day))
+        today = datetime.date.today()
+        occurrences = self.occurrence_qs.starts_on(dt)
+
+        context = RequestContext(request)
+        context['occurrence_pool'] = occurrences
+        context['day'] = dt
+        context['is_today'] = dt == today
+        return render_to_response(template, context)
+
     def index(self, request):
+        # In your subclass, you may prefer:
+        # return self.today(request)
         return self.occurrence_list(request)
 
-    # In your subclass, you may prefer: 
-    # def index(self, request):
-    #     today = datetime.date.today()
-    #     return self.on_date(request, today.year, today.month, today.day)
