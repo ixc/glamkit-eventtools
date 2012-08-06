@@ -80,7 +80,7 @@ class OccurrenceModel(XTimespanModel):
         generated_by = models.ForeignKey(ExampleGenerator, related_name="occurrences", blank=True, null=True)
     """
 
-    status = models.CharField(max_length=20, blank=True, choices=settings.OCCURRENCE_STATUS_CHOICES)
+    status = models.CharField(max_length=20, blank=True, verbose_name=_('status'), choices=settings.OCCURRENCE_STATUS_CHOICES)
 
     objects = OccurrenceManager()
     
