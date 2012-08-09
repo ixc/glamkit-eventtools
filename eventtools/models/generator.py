@@ -1,4 +1,6 @@
-# −*− coding: UTF−8 −*−
+# -*- coding: utf-8 -*-
+
+
 from django.db import models, transaction
 from django.db.models.base import ModelBase
 from django.utils.translation import ugettext, ugettext_lazy as _
@@ -33,9 +35,10 @@ class GeneratorModel(XTimespanModel):
     """
 
     #define a FK called 'event' in the subclass
-    rule = models.ForeignKey("eventtools.Rule")
+    rule = models.ForeignKey("eventtools.Rule", verbose_name=_('rule'))
     repeat_until = models.DateField(
         null=True, blank = True,
+        verbose_name=_('repeat until'),
         help_text=_(u"Occurrences will repeat up to and including this date. If ommitted, the next year's worth of "
             "occurrences will be created."
         )
@@ -44,8 +47,8 @@ class GeneratorModel(XTimespanModel):
     class Meta:
         abstract = True
         ordering = ('start',)
-        verbose_name = "repeating occurrence"
-        verbose_name_plural = "repeating occurrences"
+        verbose_name = _("repeating occurrence")
+        verbose_name_plural = _("repeating occurrences")
 
     def __unicode__(self):
         return u"%s, %s" % (self.event, self.robot_description())

@@ -48,11 +48,11 @@ def _remove_occurrences(modeladmin, request, queryset):
         if m.generated_by is not None:
             m.event.exclusions.get_or_create(start=m.start)
         m.delete()
-_remove_occurrences.short_description = "Delete occurrences (and prevent recreation by a repeating occurrence)"
+_remove_occurrences.short_description = _("Delete occurrences (and prevent recreation by a repeating occurrence)")
 
 def _wipe_occurrences(modeladmin, request, queryset):
     queryset.delete()
-_wipe_occurrences.short_description = "Delete occurrences (but allow recreation by a repeating occurrence)"
+_wipe_occurrences.short_description = _("Delete occurrences (but allow recreation by a repeating occurrence)")
 
 def _convert_to_oneoff(modeladmin, request, queryset):
     for m in queryset:
@@ -60,19 +60,19 @@ def _convert_to_oneoff(modeladmin, request, queryset):
         if m.generated_by is not None:
             m.event.exclusions.get_or_create(start=m.start)
     queryset.update(generated_by=None)
-_convert_to_oneoff.short_description = "Make occurrences one-off (and prevent recreation by a repeating occurrence)"
+_convert_to_oneoff.short_description = _("Make occurrences one-off (and prevent recreation by a repeating occurrence)")
 
 def _cancel(modeladmin, request, queryset):
     queryset.update(status=settings.OCCURRENCE_STATUS_CANCELLED[0])
-_cancel.short_description = "Make occurrences cancelled"
+_cancel.short_description = _("Make occurrences cancelled")
 
 def _fully_booked(modeladmin, request, queryset):
     queryset.update(status=settings.OCCURRENCE_STATUS_FULLY_BOOKED[0])
-_fully_booked.short_description = "Make occurrences fully booked"
+_fully_booked.short_description = _("Make occurrences fully booked")
 
 def _clear_status(modeladmin, request, queryset):
     queryset.update(status="")
-_clear_status.short_description = "Clear booked/cancelled status"
+_clear_status.short_description = _("Clear booked/cancelled status")
 
 class OccurrenceAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -234,8 +234,8 @@ def EventAdmin(EventModel, SuperModel=MPTTModelAdmin, show_exclusions=False, sho
     class _EventAdmin(SuperModel):
         form = EventForm(EventModel)
         list_display = ['unicode_bold_if_listed', 'occurrence_link', 'season', 'status'] # leave as list to allow extension
-        change_form_template = 'admin/eventtools/event.html'
-        save_on_top = True
+        change_form_template = kwargs['change_form_template'] if 'change_form_template' in kwargs else 'admin/eventtools/event.html'
+        save_on_top = kwargs['save_on_top'] if 'save_on_top' in kwargs else True
         prepopulated_fields = {'slug': ('title', )}
         search_fields = ('title',)
 
@@ -300,7 +300,7 @@ def EventAdmin(EventModel, SuperModel=MPTTModelAdmin, show_exclusions=False, sho
             url = self.occurrence_edit_url(event)
 
             if count == 0:
-                return 'No occurrences yet'
+                return _('No occurrences yet')
             elif count == 1:
                 r = '<a href="%s">1 Occurrence</a>' % url
             else:
@@ -309,7 +309,7 @@ def EventAdmin(EventModel, SuperModel=MPTTModelAdmin, show_exclusions=False, sho
                     count,
                 )
             return r + ' (%s direct)' % direct_count
-        occurrence_link.short_description = 'Edit Occurrences'
+        occurrence_link.short_description = _('Edit Occurrences')
         occurrence_link.allow_tags = True
 
         def get_urls(self):

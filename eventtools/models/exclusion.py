@@ -1,6 +1,7 @@
 # (We thought of calling it Exceptions, but Python has them)
 
 from django.db import models
+from django.utils.translation import ugettext, ugettext_lazy as _
 
 class ExclusionModel(models.Model):
     """
@@ -11,13 +12,13 @@ class ExclusionModel(models.Model):
     
     event = models.ForeignKey(SomeEvent, related_name="exclusions")
     """
-    start = models.DateTimeField(db_index=True)
+    start = models.DateTimeField(db_index=True, verbose_name=_('start'))
 
     class Meta:
         abstract = True
         ordering = ('start',)
-        verbose_name = "repeating occurrence exclusion"
-        verbose_name_plural = "repeating occurrence exclusions"
+        verbose_name = _("repeating occurrence exclusion")
+        verbose_name_plural = _("repeating occurrence exclusions")
         unique_together = ('event', 'start')
         
     def __unicode__(self):

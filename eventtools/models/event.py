@@ -209,19 +209,20 @@ class EventModel(MPTTModel):
     
     parent = models.ForeignKey('self',
         null=True, blank=True, related_name='children',
-        help_text="Which event is this event derived from. Use the 'create a variation' on the parent event to inherit the parent's information.")
+        verbose_name=_('parent'),
+        help_text=_("Which event is this event derived from. Use the 'create a variation' on the parent event to inherit the parent's information."))
     # 'parent' is more flexible than 'template'.
-    title = models.CharField(max_length=255)
-    slug = models.SlugField("URL name", unique=True, help_text="This is used in\
-     the event's URL, and should be unique and unchanging.")
+    title = models.CharField(_('title'), max_length=255)
+    slug = models.SlugField(_("URL name"), unique=True, help_text=_("This is used in\
+     the event's URL, and should be unique and unchanging."))
     season_description = models.CharField(_("season"), blank=True, null=True, 
-        max_length=200, help_text="a summary description of when this event \
+        max_length=200, help_text=_("a summary description of when this event \
         is on (e.g. 24 August - 12 September 2012). One will be generated from \
-        the occurrences if not provided)"
+        the occurrences if not provided)")
     )
     sessions_description = models.TextField(_("sessions"), blank=True,
-        null=True, help_text="a detailed description of when sessions are\
-        (e.g. \'Tuesdays and Thursdays throughout February, at 10:30am\')"
+        null=True, help_text=_("a detailed description of when sessions are\
+        (e.g. \'Tuesdays and Thursdays throughout February, at 10:30am\')")
     )
 
     class Meta:

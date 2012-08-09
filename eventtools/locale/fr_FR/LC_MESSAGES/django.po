@@ -1,0 +1,293 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-07-17 13:13+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: admin.py:51
+msgid "Delete occurrences (and prevent recreation by a repeating occurrence)"
+msgstr "Supprimer les occurrences (et empêcher leur recréation par le biais d'une occurrence répétée)"
+
+#: admin.py:55
+msgid "Delete occurrences (but allow recreation by a repeating occurrence)"
+msgstr "Supprimer les occurrences (mais autoriser la recréation par le biais d'un occurrence répétée)"
+
+#: admin.py:63
+msgid ""
+"Make occurrences one-off (and prevent recreation by a repeating occurrence)"
+msgstr "Rendre les occurrences "
+
+#: admin.py:67
+msgid "Make occurrences cancelled"
+msgstr "Donner le status 'annulé' aux aoccurrences"
+
+#: admin.py:71
+msgid "Make occurrences fully booked"
+msgstr "Donner les statut 'complet' aux occurrences"
+
+#: admin.py:75
+msgid "Clear booked/cancelled status"
+msgstr "Supprimer les statuts 'annulé' ou 'complet'"
+
+#: admin.py:286
+msgid ""
+"title (items in bold will be listed; other items are templates or variations)"
+msgstr ""
+"titre (les items en gras seront listés; les autres items sont des gabarits "
+"ou des variations)"
+
+#: admin.py:303
+#, fuzzy
+msgid "No occurrences yet"
+msgstr "occurrences répétées"
+
+#: admin.py:312
+#, fuzzy
+msgid "Edit Occurrences"
+msgstr "occurrences répétées"
+
+#: filters.py:9
+msgid "type"
+msgstr "type"
+
+#: filters.py:23
+msgid "Generated in same event"
+msgstr "Généré dans le même évènement"
+
+#: filters.py:24
+msgid "Generated in ancestor event"
+msgstr "Généré dans un évènement parent"
+
+#: filters.py:25
+msgid "Generated anywhere"
+msgstr "Généré n'importe où"
+
+#: filters.py:26
+msgid "One-off"
+msgstr "Unique"
+
+#: models/event.py:212
+msgid "parent"
+msgstr "parent"
+
+#: models/event.py:213
+msgid ""
+"Which event is this event derived from. Use the 'create a variation' on the "
+"parent event to inherit the parent's information."
+msgstr ""
+"L'évènement duquel cet évènement est dérivé. Utilisez la fonctionnalité "
+"'créer une variation' sur l'évènement parent pour hériter de ses informations"
+
+#: models/event.py:215
+msgid "title"
+msgstr "titre"
+
+#: models/event.py:216
+msgid "URL name"
+msgstr "Permalien"
+
+#: models/event.py:216
+msgid ""
+"This is used in     the event's URL, and should be unique and unchanging."
+msgstr ""
+"Ceci est utilisé pour construire l'URL de l'évènement, et doit être unique "
+"et constant"
+
+#: models/event.py:218
+msgid "season"
+msgstr "saison"
+
+#: models/event.py:219
+msgid ""
+"a summary description of when this event         is on (e.g. 24 August - 12 "
+"September 2012). One will be generated from         the occurrences if not "
+"provided)"
+msgstr ""
+"Un résumé de quand cet évènement a lieu (ex. 24 août - 12 septembre 2012). "
+"Généré automatiquement si le champ n'est pas rempli"
+
+#: models/event.py:223
+msgid "sessions"
+msgstr "sessions"
+
+#: models/event.py:224
+msgid ""
+"a detailed description of when sessions are        (e.g. 'Tuesdays and "
+"Thursdays throughout February, at 10:30am')"
+msgstr ""
+"une description détaillée de quand les sessions ont lieu (ex. 'Les mardis et "
+"jeudis de février, à 10h30'"
+
+#: models/exclusion.py:15 models/xseason.py:52 models/xtimespan.py:57
+msgid "start"
+msgstr "début"
+
+#: models/exclusion.py:20
+msgid "repeating occurrence exclusion"
+msgstr "exclusion d'occurrences répétées"
+
+#: models/exclusion.py:21
+msgid "repeating occurrence exclusions"
+msgstr "exclusions d'occurrences répétées"
+
+#: models/generator.py:38
+msgid "rule"
+msgstr "règle"
+
+#: models/generator.py:41
+msgid "repeat until"
+msgstr "répéter jusqu'au"
+
+#: models/generator.py:42
+msgid ""
+"Occurrences will repeat up to and including this date. If ommitted, the next "
+"year's worth of occurrences will be created."
+msgstr ""
+"Les occurrences se répèterons jusqu'à cette date incluse. En cas "
+"d'ommission, des événements seront créés sur un an."
+
+#: models/generator.py:50
+msgid "repeating occurrence"
+msgstr "occurrence répétée"
+
+#: models/generator.py:51
+msgid "repeating occurrences"
+msgstr "occurrences répétées"
+
+#: models/occurrence.py:83
+msgid "status"
+msgstr "status"
+
+#: models/rule.py:8
+msgid "Yearly"
+msgstr "Annuel"
+
+#: models/rule.py:9
+msgid "Monthly"
+msgstr "Mensuel"
+
+#: models/rule.py:10
+msgid "Weekly"
+msgstr "Hebdomadaire"
+
+#: models/rule.py:11
+msgid "Daily"
+msgstr "Journalier"
+
+#: models/rule.py:43
+msgid "name"
+msgstr "nom"
+
+#: models/rule.py:44
+msgid "a short friendly name for this repetition."
+msgstr "un nom court convivial pour cette répétition."
+
+#: models/rule.py:47
+msgid "common rules appear at the top of the list."
+msgstr "les règles communes apparaisent en haut de la liste."
+
+#: models/rule.py:50
+msgid "frequency"
+msgstr "fréquence"
+
+#: models/rule.py:51
+msgid "the base repetition period."
+msgstr "la période de répétition de base."
+
+#: models/rule.py:54
+msgid "inclusion parameters"
+msgstr "paramètres d'inclusion"
+
+#: models/rule.py:55
+msgid "extra params required to define this type of repetition."
+msgstr ""
+"paramètres supplémentaires nécéssaires pour définire ce type de répétition."
+
+#: models/rule.py:58
+msgid "complex rules"
+msgstr "règles complexes"
+
+#: models/rule.py:58
+msgid "overrides all other settings."
+msgstr "outrepasse tous les autres paramètres"
+
+#: models/rule.py:63
+msgid "repetition rule"
+msgstr "règle de répétition"
+
+#: models/rule.py:64
+msgid "repetition rules"
+msgstr "règles de répétition"
+
+#: models/xseason.py:53
+msgid "end"
+msgstr "fin"
+
+#: models/xtimespan.py:58
+msgid "duration (mins)"
+msgstr "durée (minutes)"
+
+#: models/xtimespan.py:58
+msgid ""
+"to create 'all day' events, set start time to 00:00 and leave duration blank"
+msgstr ""
+"pour créer des évènements sur toute la journée, régler l'heure de début sur "
+"00:00 et ne pas spécifier de durée"
+
+#: models/xtimespan.py:151
+msgid "all day"
+msgstr "toute la journée"
+
+#: models/xtimespan.py:193
+msgid "Today"
+msgstr "Aujourd'hui"
+
+#: models/xtimespan.py:195
+msgid "Tomorrow"
+msgstr "Demain"
+
+#: models/xtimespan.py:197
+msgid "Yesterday"
+msgstr "Hier"
+
+#: templates/admin/eventtools/event.html:58
+#: templates/admin/eventtools/feincmsevent.html:68
+msgid "Create a variation of this event"
+msgstr "Créer une variation de cet évènement"
+
+#: templates/admin/eventtools/event.html:59
+#: templates/admin/eventtools/feincmsevent.html:69
+msgid "View child occurrences"
+msgstr "Voir les occurrences répétées"
+
+#: templates/admin/eventtools/event.html:69
+#: templates/admin/eventtools/feincmsevent.html:79
+msgid "Variation family"
+msgstr "Variation de la famille"
+
+#: templates/admin/eventtools/occurrence_list.html:9
+#, python-format
+msgid "Add %(name)s"
+msgstr "Ajouter %(name)s"
+
+#: templates/admin/eventtools/occurrence_list.html:16
+#, python-format
+msgid ""
+"Showing all occurrences of <a href=\"%(root_event_change_url)s\">"
+"%(root_event)s</a> and its descendants"
+msgstr ""
+"Montrer toutes les occurrences de <a href=\"%(root_event_change_url)s\">"
+"%(root_event)s</a> et ses enfants"

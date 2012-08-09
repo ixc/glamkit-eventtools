@@ -3,6 +3,7 @@ from django.db import models
 from eventtools.utils.pprint_timespan \
     import pprint_datetime_span, pprint_date_span
 from django.core.exceptions import ValidationError
+from django.utils.translation import ugettext, ugettext_lazy as _
 
 class SeasonQSFN(object):
     def current_on(self, date):
@@ -48,8 +49,8 @@ class XSeasonModel(models.Model):
     The fields are optional - both omitted means 'ongoing'.
     """
 
-    start = models.DateField(null=True, blank=True)
-    end = models.DateField(null=True, blank=True)
+    start = models.DateField(null=True, blank=True, verbose_name=_('start'))
+    end = models.DateField(null=True, blank=True, verbose_name=_('end'))
     
     objects = SeasonManager()
 

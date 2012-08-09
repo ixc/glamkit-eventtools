@@ -54,7 +54,7 @@ class XTimespanManager(models.Manager):
 
 
 class XTimespanModel(models.Model):
-    start = models.DateTimeField(db_index=True)
+    start = models.DateTimeField(db_index=True, verbose_name=_('start'))
     _duration = models.PositiveIntegerField(_("duration (mins)"), blank=True, null=True, help_text=_("to create 'all day' events, set start time to 00:00 and leave duration blank"))
 
     objects = XTimespanManager()
