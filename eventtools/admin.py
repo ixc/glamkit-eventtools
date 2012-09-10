@@ -228,7 +228,7 @@ def EventForm(EventModel):
             model = EventModel
     return _EventForm
 
-def EventAdmin(EventModel, SuperModel=MPTTModelAdmin, show_exclusions=False, show_generator=True):
+def EventAdmin(EventModel, SuperModel=MPTTModelAdmin, show_exclusions=False, show_generator=True, *args, **kwargs):
     """ pass in the name of your EventModel subclass to use this admin. """
     
     class _EventAdmin(SuperModel):
