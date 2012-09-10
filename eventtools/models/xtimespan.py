@@ -146,7 +146,7 @@ class XTimespanModel(models.Model):
     def html_timespan(self):
         return self.timespan_description(html=True)
 
-    def time_description(self, html=False):
+    def time_description(self, html=False, *args, **kwargs):
         if self.all_day():
             return mark_safe(_("all day"))
 
@@ -157,8 +157,8 @@ class XTimespanModel(models.Model):
             t2 = t1
 
         if html:
-            return mark_safe(pprint_time_span(t1, t2, range_str="&ndash;&#8203;"))
-        return pprint_time_span(t1, t2)
+            return mark_safe(pprint_time_span(t1, t2, range_str="&ndash;&#8203;", *args, **kwargs))
+        return pprint_time_span(t1, t2, *args, **kwargs)
 
     def html_time_description(self):
         return self.time_description(html=True)
