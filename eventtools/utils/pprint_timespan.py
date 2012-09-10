@@ -134,12 +134,11 @@ def pprint_time_span(time1, time2, separator=":", am="am", pm="pm", midnight="mi
                 else:
                     t1ap = "noon"
                 t1h = ""
-        
-            #render the minutes only if necessary
-            if t1m != "00":
+
+            if t1ap not in (midnight, noon):
                 t1 = t1h+separator+t1m
             else:
-                t1 = t1h
+                t1 = ""
         
             #Case: the two are equal; no range
             if (time1 == time2):
@@ -158,11 +157,11 @@ def pprint_time_span(time1, time2, separator=":", am="am", pm="pm", midnight="mi
             else:
                 t2ap = "noon"
             t2h = ""
-        
-        if t2m != "00":
+
+        if t2ap not in (midnight, noon):
             t2 = t2h+separator+t2m
         else:
-            t2 = t2h
+            t2 = ""
     
         if time1 is not None:
             #get rid of redundancies
