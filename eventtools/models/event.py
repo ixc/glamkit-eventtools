@@ -444,7 +444,7 @@ class EventModel(MPTTModel):
     def variation_occurrences(self):
         return self.occurrences_in_listing().exclude(event=self)
 
-    def times_description(self, formatting='%I.%M%p'):
+    def times_description(self, formatting=None):
         """
         Produces a string representing the regular time in which an event occurs.
 
@@ -453,6 +453,10 @@ class EventModel(MPTTModel):
         Ex: for an event with irregular times or multiple occurrences per day, it
             returns 'Times vary'
         """
+
+        if not formatting: # use default formatting
+            formatting = '%I.%M%p'
+
         starting_times = list(set([
             occurrence.start.time() for occurrence in self.occurrences.all()
         ]))
