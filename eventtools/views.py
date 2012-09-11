@@ -45,10 +45,10 @@ class EventViews(object):
                 url(r'^(?P<event_slug>[-\w]+)/(?P<occurrence_pk>[\d]+)/$', self.occurrence, name='occurrence'),
 
                 #ical - needs rethinking
-                # url(r'^ical\.ics$', self.occurrence_list_ical, name='occurrence_list_ical'),
-                # url(r'^(?P<event_slug>[-\w]+)/ical\.ics$', self.event_ical, name='event_ical'),
+                url(r'^ical\.ics$', self.occurrence_list_ical, name='occurrence_list_ical'),
+                url(r'^(?P<event_slug>[-\w]+)/ical\.ics$', self.event_ical, name='event_ical'),
                 # url(r'^(?P<event_slug>[-\w]+)/(?P<occurrence_id>\d+)/ical\.ics$', \
-                #     self.occurrence_ical, name='occurrence_ical'),
+                  # self.occurrence_ical, name='occurrence_ical'),
             ),
             "events", # application namespace
             "events", # instance namespace
@@ -78,9 +78,9 @@ class EventViews(object):
         return render_to_response('eventtools/event.html', context)
 
 
-    # def event_ical(self, request, event_slug):
-    #     event_context = self._event_context(request, event_slug)
-    #     return response_as_ical(request, event_context['occurrence_pool'])
+    def event_ical(self, request, event_slug):
+        event_context = self._event_context(request, event_slug)
+        return response_as_ical(request, event_context['occurrence_pool'])
 
     #occurrence_list
     def _occurrence_list_context(self, request, qs):
@@ -109,10 +109,10 @@ class EventViews(object):
         context.update(self._occurrence_list_context(request, self.occurrence_qs))        
         return render_to_response(template, context)
     
-    # def occurrence_list_ical(self, request):
-    #     occurrence_list_context = self._occurrence_list_context(request, self.occurrence_qs)
-    #     pool = occurrence_list_context['occurrence_pool']
-    #     return response_as_ical(request, pool)
+    def occurrence_list_ical(self, request):
+        occurrence_list_context = self._occurrence_list_context(request, self.occurrence_qs)
+        pool = occurrence_list_context['occurrence_pool']
+        return response_as_ical(request, pool)
 
     def on_date(self, request, year, month, day):
         template = 'eventtools/occurrence_list.html'
