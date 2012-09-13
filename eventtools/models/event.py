@@ -467,17 +467,12 @@ class EventModel(MPTTModel):
         else:
             return 'Times vary'
 
-    # ical functions coming back soon
-    # def ics_url(self):
-    #     """
-    #     Needs to be fully-qualified (for sending to calendar apps). Your app needs to define
-    #     an 'ics_for_event' view and url, and properties for populating an ics for each event
-    #     (see OccurrenceModel.as_icalendar for default properties)
-    #     """
-    #     return django_root_url() + reverse("ics_for_event", args=[self.pk])
-    # 
-    # def webcal_url(self):
-    #     return self.ics_url().replace("http://", "webcal://").replace("https://", "webcal://")
-    #     
-    # def gcal_url(self):
-    #     return  "http://www.google.com/calendar/render?cid=%s" % urlencode(self.ics_url())
+    def ical_url(self):
+         # Needs to be fully-qualified (for sending to calendar apps)
+         return settings.ICAL_ROOT_URL + reverse("events:event_ical", args=[self.slug])
+
+    def webcal_url(self):
+         return self.ical_url().replace("http://", "webcal://").replace("https://", "webcal://")
+
+    def gcal_url(self):
+         return  "http://www.google.com/calendar/render?cid=%s" % urlencode(self.ical_url())

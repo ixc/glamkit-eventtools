@@ -137,8 +137,6 @@ class OccurrenceModel(XTimespanModel):
 
         return None
 
-    # ical is coming back soon.
-
     def _resolve_attr(self, attr):
          v = getattr(self, attr, None)
          if v is not None:
@@ -150,7 +148,16 @@ class OccurrenceModel(XTimespanModel):
          return unicode(self.event)
 
     def ical_description(self):
-        return unicode(self.event.mobile_description.value_to_string())
+        """
+        Try to gracefully fall back through various conventions of descriptive fields
+        """
+        if hasattr(self.event, 'mobile_description') and unicode(self.event.mobile_description):
+            return unicode(self.event.mobile_description)
+        elif hasattr(self.event, 'teaser'):
+            if hasattr(self.event.teaser, 'raw'):
+                return unicode(self.event.teaser.raw)
+            else:
+                return unicode(self.event.teaser)
 
     def as_icalendar(self,
          ical,
@@ -230,16 +237,12 @@ class OccurrenceModel(XTimespanModel):
 
          return ical
 
-    def ics_url(self):
-         """
-         Needs to be fully-qualified (for sending to calendar apps). Your app needs to define
-         an 'ics_for_occurrence' url, and properties for populating an ics for each event
-         (see OccurrenceModel.as_icalendar)
-         """
-         return django_root_url() + reverse("ics_for_occurrence", args=[self.pk])
+    def ical_url(self):
+         # Needs to be fully-qualified (for sending to calendar apps)
+         return settings.ICAL_ROOT_URL + reverse("events:occurrence_ical", args=[self.event.slug, self.pk])
 
     def webcal_url(self):
-         return self.ics_url().replace("http://", "webcal://").replace("https://", "webcal://")
+         return self.ical_url().replace("http://", "webcal://").replace("https://", "webcal://")
 
     def gcal_url(self):
-         return  "http://www.google.com/calendar/render?cid=%s" % urlencode(self.ics_url())
+         return "http://www.google.com/calendar/render?cid=%s" % urlencode(self.ical_url())

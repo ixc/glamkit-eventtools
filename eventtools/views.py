@@ -44,11 +44,11 @@ class EventViews(object):
                 url(r'^(?P<event_slug>[-\w]+)/$', self.event, name='event'),
                 url(r'^(?P<event_slug>[-\w]+)/(?P<occurrence_pk>[\d]+)/$', self.occurrence, name='occurrence'),
 
-                #ical - needs rethinking
-                url(r'^ical\.ics$', self.occurrence_list_ical, name='occurrence_list_ical'),
+                # iCal
                 url(r'^(?P<event_slug>[-\w]+)/ical\.ics$', self.event_ical, name='event_ical'),
-                # url(r'^(?P<event_slug>[-\w]+)/(?P<occurrence_id>\d+)/ical\.ics$', \
-                  # self.occurrence_ical, name='occurrence_ical'),
+                url(r'^(?P<event_slug>[-\w]+)/(?P<occurrence_pk>\d+)/ical\.ics$',
+                    self.occurrence_ical, name='occurrence_ical'),
+                url(r'^ical\.ics$', self.occurrence_list_ical, name='occurrence_list_ical'),
             ),
             "events", # application namespace
             "events", # instance namespace
@@ -60,6 +60,13 @@ class EventViews(object):
         context['event'] = event
 
         return render_to_response('eventtools/event.html', context)
+
+    def event_ical(self, request, event_slug):
+        """
+        Returns all of an Event's occurrences as an iCal file
+        """
+        event = get_object_or_404(self.event_qs, slug=event_slug)
+        return response_as_ical(request, event.occurrences.all())
 
     def occurrence(self, request, event_slug, occurrence_pk):
         """
@@ -77,10 +84,12 @@ class EventViews(object):
 
         return render_to_response('eventtools/event.html', context)
 
-
-    def event_ical(self, request, event_slug):
-        event_context = self._event_context(request, event_slug)
-        return response_as_ical(request, event_context['occurrence_pool'])
+    def occurrence_ical(self, request, event_slug, occurrence_pk):
+        """
+        Returns a single Occurrence as an iCal file
+        """
+        occurrence = get_object_or_404(self.occurrence_qs, pk=occurrence_pk)
+        return response_as_ical(request, occurrence)
 
     #occurrence_list
     def _occurrence_list_context(self, request, qs):
@@ -108,11 +117,13 @@ class EventViews(object):
         context = RequestContext(request)
         context.update(self._occurrence_list_context(request, self.occurrence_qs))        
         return render_to_response(template, context)
-    
+
     def occurrence_list_ical(self, request):
-        occurrence_list_context = self._occurrence_list_context(request, self.occurrence_qs)
-        pool = occurrence_list_context['occurrence_pool']
-        return response_as_ical(request, pool)
+        """
+        Returns an iCal file containing all occurrences returned from `self._occurrence_list`
+        """
+        occurrences = self._occurrence_list_context(request, self.occurrence_qs)['occurrence_pool']
+        return response_as_ical(request, occurrences)
 
     def on_date(self, request, year, month, day):
         template = 'eventtools/occurrence_list.html'
