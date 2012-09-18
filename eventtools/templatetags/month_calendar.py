@@ -62,6 +62,10 @@ def month_calendar(context, events_pool=[], month=None, show_header=True, select
         if selected_start:
             if selected_end >= day >= selected_start:
                 classes.append('selected')
+        if day.day > 9:
+            classes.append('two-digit-day')
+        else:
+            classes.append('one-digit-day')
         events = events_by_date.get(day, [])
         if events:
             classes.append("has_events")
