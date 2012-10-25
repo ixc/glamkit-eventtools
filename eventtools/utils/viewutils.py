@@ -48,8 +48,20 @@ def parse_GET_date(GET={}):
     return fr, to
     
 def response_as_ical(request, occurrences):
+
     ical = iCalendar()
-    ical.add('X-WR-CALNAME').value = settings.ICAL_CALNAME
+
+    cal_name = settings.ICAL_CALNAME
+    # If multiple occurrences with one event, name the calendar after the event
+    if hasattr(occurrences, '__iter__'):
+        events = list(set([o.event for o in occurrences]))
+        if len(events) == 1:
+            cal_name = unicode(events[0])
+    # If a single occurrence with an event
+    elif getattr(occurrences, 'event', None):
+        cal_name = unicode(occurrences.event)
+
+    ical.add('X-WR-CALNAME').value = cal_name
     ical.add('X-WR-CALDESC').value = settings.ICAL_CALDESC
     ical.add('method').value = 'PUBLISH'  # IE/Outlook needs this
 
