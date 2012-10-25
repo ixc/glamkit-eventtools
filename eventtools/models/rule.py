@@ -93,7 +93,7 @@ class Rule(models.Model):
         if self.complex_rule:
             d = dtstart.date()
             weekday = weekdays[d.weekday()]
-            n = 1 + (d.day / 7)
+            n = 1 + (d.day-1)/7
 
             start_day, days_in_month = calendar.monthrange(d.year, d.month)
             days_from_end = days_in_month - d.day
