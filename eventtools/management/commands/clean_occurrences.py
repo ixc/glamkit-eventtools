@@ -32,10 +32,7 @@ class Command(LabelCommand):
                 # Check if occurrence length doesn't match the generator length
                 # and make sure it's not an exception. We can't use
                 # .is_exception() because it tries to modify stuff.
-                if (not generator.exceptions
-                    or not generator.exceptions.has_key(
-                        occurrence.start.isoformat())
-                ) and occurrence.end - occurrence.start != generator_length:
+                if occurrence.end - occurrence.start != generator_length:
                     bad_occurrences += 1
                     # Don't do anything on a dry run
                     if not dry_run:
@@ -61,21 +58,14 @@ class Command(LabelCommand):
                     # validation, it will fail
                     Model.save(generator)
                     for occurrence in generator.occurrences.all():
-                        if (not generator.exceptions
-                            or not generator.exceptions.has_key(
-                                occurrence.start.isoformat())
-                        ):
-                            occurrence.end = occurrence.end.replace(
-                                *occurrence.start.timetuple()[:3])
-                            Model.save(occurrence)
+                        occurrence.end = occurrence.end.replace(
+                            *occurrence.start.timetuple()[:3])
+                        Model.save(occurrence)
             # Check for duplicates
             deleted_pks = []
             duplicates = 0
             for occurrence in generator.occurrences.all():
-                if not generator.exceptions \
-                        or not generator.exceptions.has_key(
-                            occurrence.start.isoformat()) \
-                        and not occurrence.pk in deleted_pks:
+                if not occurrence.pk in deleted_pks:
                     possible_duplicates = generator.occurrences.filter(
                         start=occurrence.start, end=occurrence.end).exclude(
                             pk=occurrence.pk)
