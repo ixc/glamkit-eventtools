@@ -49,9 +49,11 @@ class GeneratorModel(models.Model):
         return u"%s, %s" % (self.event, self.robot_description())
 
     def clean(self):
+        if self.event_start is None:
+            # Let the regular blank=True validation throw the error
+            return super(GeneratorModel, self).clean()
         if self.event_end is None:
             self.event_end = self.event_start
-
         if self.event_start > self.event_end:
             raise exceptions.ValidationError('start must be earlier than end')
         if self.repeat_until is not None and \
@@ -67,7 +69,7 @@ class GeneratorModel(models.Model):
             raise exceptions.ValidationError('The event timespan is longer '
                 'than the repetition frequency. The "repeat until" date may '
                 'have been mistakenly used as the "event end".')
-        super(GeneratorModel, self).clean()
+        return super(GeneratorModel, self).clean()
 
 
     @transaction.commit_on_success()
