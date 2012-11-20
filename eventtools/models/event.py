@@ -270,8 +270,10 @@ class EventModel(MPTTModel):
                     pass
     
     def save(self, *args, **kwargs):
+        update_generators = kwargs.pop('update_generators', True)
         self.cascade_changes_to_children()
-        self.update_generators()
+        if update_generators:
+            self.update_generators()
         return super(EventModel, self).save(*args, **kwargs)
     
     @staticmethod #connected in the metaclass
