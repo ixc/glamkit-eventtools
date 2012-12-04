@@ -19,3 +19,12 @@ glamkit-eventtools Authors:
 
     * Thomas Ashelford <thomas@interaction.net.au>
     * Greg Turner <greg@interaction.net.au>
+
+glamkit-eventtools Contributors:
+
+    * Andrea Lau
+    * Aram Dulyan
+    * George Karpenkov
+    * Oktay Sancak
+    * Simon Meers
+    * Wil Tan

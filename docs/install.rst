@@ -4,7 +4,7 @@
 Getting The Code
 ================
 
-The project is available through `Github <http://github.com/glamkit/glamkit-events/tree>`_.
+The project is available through `Github <http://github.com/ixc/glamkit-events`_.
 
 .. _ref-configure:
 
