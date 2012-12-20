@@ -4,6 +4,7 @@
 from django.db import models, transaction
 from django.db.models.base import ModelBase
 from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.timezone import get_current_timezone
 from django.core import exceptions
 
 from dateutil import rrule
@@ -108,14 +109,24 @@ class GeneratorModel(XTimespanModel):
         return r
         
     def _generate_dates(self):
-        rule = self.rule.get_rrule(dtstart=self.start)
-        date_iter = iter(rule)
         drop_dead_date = datetime.combine(self.repeat_until or date.today() \
             + settings.DEFAULT_GENERATOR_LIMIT, time.max)
-                
+
+        # We may need a timezone-aware datetime if our rule generates
+        # non-naive datetime occurrences
+        drop_dead_date_with_tzinfo = drop_dead_date.replace(
+            tzinfo=get_current_timezone())
+
+        # Yield rule's occurrence datetimes up until "drop dead" date(time)
+        rule = self.rule.get_rrule(dtstart=self.start)
+        date_iter = iter(rule)
         while True:
             d = date_iter.next()
-            if d > drop_dead_date:
+            if d.tzinfo:
+                dddate = drop_dead_date_with_tzinfo
+            else:
+                dddate = drop_dead_date
+            if d > dddate:
                 break
             yield d
     
