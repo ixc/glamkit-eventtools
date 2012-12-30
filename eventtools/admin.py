@@ -256,14 +256,54 @@ def OccurrenceAdmin(OccurrenceModel):
                 # and since relative URLs are used on changelist:
                 url(r'for_event/(?P<event_id>\d+)/(?P<object_id>\d+)/$',
                     self.redirect_to_change_view),
+                url(r'for_event/(?P<event_id>\d+)/add/$',
+                    self.redirect_to_add_view),
                 ) + super(_OccurrenceAdmin, self).get_urls()
 
         def redirect_to_change_view(self, request, event_id, object_id):
             return redirect('%s:%s_%s_change' % (
-                    self.admin_site.name,
-                    OccurrenceModel._meta.app_label,
-                    OccurrenceModel._meta.module_name), object_id)
+                self.admin_site.name,
+                OccurrenceModel._meta.app_label,
+                OccurrenceModel._meta.module_name), object_id)
 
+        def redirect_to_add_view(self, request, event_id):
+            return redirect(reverse('%s:%s_%s_add' % (
+                self.admin_site.name,
+                OccurrenceModel._meta.app_label,
+                OccurrenceModel._meta.module_name
+            )) + '?event=%s' % event_id)
+
+        def save_model(self, request, obj, *args, **kwargs):
+            """
+            Populate the occurrence's event from the "event" parameter in GET,
+            which all admin links to this page will supply.
+            """
+            if not obj.event_id and request.GET.get('event', None):
+                obj.event_id = request.GET['event']
+            return super(_OccurrenceAdmin, self).save_model(
+                request, obj, *args, **kwargs)
+        
+        def _add_another_redirect(self, request, obj):
+            """
+            A helper function that redirects to the correct add occurrence view
+            with a supplied event id, used for views which can receive an "add
+            another" directive.
+            """
+            if '_popup' not in request.POST and '_addanother' in request.POST:
+                return self.redirect_to_add_view(request, obj.event_id)
+        
+        def response_add(self, request, obj, *args, **kwargs):
+            """If adding another is requested, use event-aware URL."""
+            response = super(_OccurrenceAdmin, self).response_add(
+                request, obj, *args, **kwargs)
+            return self._add_another_redirect(request, obj) or response
+        
+        def response_change(self, request, obj, *args, **kwargs):
+            """If adding another is requested, use event-aware URL."""
+            response = super(_OccurrenceAdmin, self).response_change(
+                request, obj, *args, **kwargs)
+            return self._add_another_redirect(request, obj) or response
+        
         def changelist_view(self, request, event_id=None, extra_context=None):
             if event_id:
                 request._event = get_object_or_404(
