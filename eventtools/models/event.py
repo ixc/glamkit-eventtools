@@ -188,7 +188,6 @@ class EventModelBase(MPTTModelBase):
             # since EventTreeManager subclasses TreeManager, it also needs the
             # mptt options. The code below mimics the behaviour in
             # mptt.models.MPTTModelBase.register
-
             manager = cls._event_meta.event_manager_class()
             manager.contribute_to_class(cls, cls._event_meta.event_manager_attr)
             manager.init_from_model(cls)
@@ -199,8 +198,8 @@ class EventModelBase(MPTTModelBase):
             
             # override the treemanager with self too,
             # so we don't need to recast all querysets
-            manager.contribute_to_class(cls, cls._mptt_meta.tree_manager_attr)
-            setattr(cls, '_tree_manager', getattr(cls, cls._mptt_meta.tree_manager_attr))
+            manager.contribute_to_class(cls, '_tree_manager')
+            setattr(cls, '_tree_manager', manager)
 
         return cls
 

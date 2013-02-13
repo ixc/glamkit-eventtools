@@ -20,7 +20,7 @@ setup(
                  'Operating System :: OS Independent',
                  'Programming Language :: Python',
                  'Topic :: Utilities'],
-    install_requires=['setuptools', 'vobject==0.8.1c', 'python-dateutil==1.5', 'django-mptt'],
+    install_requires=['setuptools', 'vobject==0.8.1c', 'python-dateutil==1.5', 'django-mptt>=0.5'],
     license='BSD',
     test_suite = "eventtools.tests",
 )
