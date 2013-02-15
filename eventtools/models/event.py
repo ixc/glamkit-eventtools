@@ -5,6 +5,7 @@ from django.db.models.base import ModelBase
 from django.db.models.fields import FieldDoesNotExist
 from django.db.models import Count
 from django.core.urlresolvers import reverse
+from django.utils.timezone import localtime
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django.template.defaultfilters import urlencode, slugify
 
@@ -369,8 +370,8 @@ class EventModel(MPTTModel):
         c = self.closing_occurrence()
         
         if o and c:
-            first = o.start.date()
-            last = c.start.date()
+            first = localtime(o.start).date()
+            last = localtime(c.start).date()
             return pprint_date_span(first, last)
             
         return None
@@ -457,7 +458,8 @@ class EventModel(MPTTModel):
             formatting = '%I.%M%p'
 
         starting_times = list(set([
-            occurrence.start.time() for occurrence in self.occurrences.all()
+            localtime(occurrence.start).time()
+            for occurrence in self.occurrences.all()
         ]))
 
         if len(starting_times) == 1:

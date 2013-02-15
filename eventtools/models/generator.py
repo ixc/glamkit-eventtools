@@ -4,7 +4,7 @@
 from django.db import models, transaction
 from django.db.models.base import ModelBase
 from django.utils.translation import ugettext, ugettext_lazy as _
-from django.utils.timezone import get_current_timezone
+from django.utils.timezone import get_current_timezone, localtime
 from django.core import exceptions
 
 from dateutil import rrule
@@ -118,7 +118,7 @@ class GeneratorModel(XTimespanModel):
             tzinfo=get_current_timezone())
 
         # Yield rule's occurrence datetimes up until "drop dead" date(time)
-        rule = self.rule.get_rrule(dtstart=self.start)
+        rule = self.rule.get_rrule(dtstart=localtime(self.start))
         date_iter = iter(rule)
         while True:
             d = date_iter.next()
@@ -274,7 +274,7 @@ class GeneratorModel(XTimespanModel):
 
     def robot_description(self):
         r = "%s, repeating %s" % (
-            pprint_datetime_span(self.start, self.end()),
+            pprint_datetime_span(localtime(self.start), localtime(self.end())),
             unicode(self.rule).lower(),
         )
         

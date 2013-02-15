@@ -1,6 +1,7 @@
 # (We thought of calling it Exceptions, but Python has them)
 
 from django.db import models
+from django.utils.timezone import localtime
 from django.utils.translation import ugettext, ugettext_lazy as _
 
 class ExclusionModel(models.Model):
@@ -22,7 +23,8 @@ class ExclusionModel(models.Model):
         unique_together = ('event', 'start')
         
     def __unicode__(self):
-        return "%s starting on %s is excluded" % (self.event, self.start)
+        return "%s starting on %s is excluded" \
+            % (self.event, localtime(self.start))
 
     def save(self, *args, **kwargs):
         """

@@ -9,6 +9,7 @@ from django.db.models import signals
 from django.db.models.base import ModelBase
 from django.template.defaultfilters import urlencode
 from django.utils.dateformat import format
+from django.utils.timezone import make_aware, localtime
 from django.utils.translation import ugettext as _
 from eventtools.models.xtimespan import XTimespanModel, XTimespanQSFN, XTimespanQuerySet, XTimespanManager
 from eventtools.conf import settings
@@ -186,9 +187,8 @@ class OccurrenceModel(XTimespanModel):
          """
          vevent = ical.add('vevent')
 
-         start = self.start
-         # Calculate the end date using the start + duration
-         end = self.start + self.duration
+         start = localtime(self.start)
+         end = localtime(self.end())
 
          if self.all_day():
              vevent.add('dtstart').value = start.date()
@@ -198,9 +198,6 @@ class OccurrenceModel(XTimespanModel):
              # and end datetimes, if they don't have a timezone already
              if not start.tzinfo and not end.tzinfo \
                      and getattr(settings, 'TIME_ZONE', None):
-                 tz = gettz(settings.TIME_ZONE)
-                 start = start.replace(tzinfo=tz)
-                 end = end.replace(tzinfo=tz)
                  # Since Google Calendar (and probably others) can't handle timezone
                  # declarations inside ICS files, convert to UTC before adding.
                  start = start.astimezone(utc)

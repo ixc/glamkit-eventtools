@@ -7,6 +7,7 @@ from eventtools.utils.datetimeify import dayify
 from eventtools.utils.managertype import ManagerType
 from eventtools.utils.pprint_timespan import pprint_datetime_span, pprint_time_span
 from django.utils.safestring import mark_safe
+from django.utils.timezone import now, localtime
 
 class XTimespanQSFN(object):
     """
@@ -38,10 +39,10 @@ class XTimespanQSFN(object):
 
     #misc queries (note they assume starts_)
     def forthcoming(self):
-        return self.starts_after(datetime.datetime.now())
+        return self.starts_after(now())
 
     def recent(self):
-        return self.starts_before(datetime.datetime.now())
+        return self.starts_before(now())
 
 class XTimespanQuerySet(models.query.QuerySet, XTimespanQSFN):
     pass #all the goodness is inherited from XTimespanQSFN
@@ -129,11 +130,13 @@ class XTimespanModel(models.Model):
         Implementers may prefer their own definition, maybe adding a 
         BooleanField that overrides the given times.
         """
-        return self.start.time() == datetime.time.min and not self._duration
+        return localtime(self.start).time() == datetime.time.min and not self._duration
 
     def timespan_description(self, html=False):
+        start = localtime(self.start)
+        end = localtime(self.end())
         if html:
-            return mark_safe(pprint_datetime_span(self.start, self.end(),
+            return mark_safe(pprint_datetime_span(start, end,
                 infer_all_day=False,
                 space="&nbsp;",
                 date_range_str="&ndash;",
@@ -141,18 +144,20 @@ class XTimespanModel(models.Model):
                 separator=":",
                 grand_range_str="&nbsp;&ndash;&nbsp;",
             ))
-        return mark_safe(pprint_datetime_span(self.start, self.end(), infer_all_day=False))
+        return mark_safe(pprint_datetime_span(start, end, infer_all_day=False))
 
     def html_timespan(self):
         return self.timespan_description(html=True)
 
     def time_description(self, html=False, *args, **kwargs):
+        start = localtime(self.start)
+        end = localtime(self.end())
         if self.all_day():
             return mark_safe(_("all day"))
 
-        t1 = self.start.time()
-        if self.start.date() == self.end().date():
-            t2 = self.end().time()
+        t1 = start.time()
+        if start.date() == end.date():
+            t2 = end.time()
         else:
             t2 = t1
 
@@ -164,10 +169,10 @@ class XTimespanModel(models.Model):
         return self.time_description(html=True)
 
     def is_finished(self):
-        return self.end() < datetime.datetime.now()
+        return self.end() < now()
 
     def is_started(self):
-        return self.start < datetime.datetime.now()
+        return self.start < now()
 
     def now_on(self):
         return self.is_started() and not self.is_finished()
@@ -179,9 +184,9 @@ class XTimespanModel(models.Model):
         If self is now on, return timedelta(0)
         """
         if not self.is_started():
-            return self.start - datetime.datetime.now()
+            return self.start - now()
         if self.is_finished():
-            return self.end() - datetime.datetime.now()
+            return self.end() - now()
         return datetime.timedelta(0)
 
     def start_date(self):
@@ -189,11 +194,11 @@ class XTimespanModel(models.Model):
         return self.start.date()
 
     def humanised_day(self):
-        if self.start.date() == datetime.date.today():
+        if self.start.date() == now().date():
             return _("Today")
-        elif self.start.date() == datetime.date.today() + datetime.timedelta(days=1):
+        elif self.start.date() == now().date() + datetime.timedelta(days=1):
             return _("Tomorrow")
-        elif self.start.date() == datetime.date.today() - datetime.timedelta(days=1):
+        elif self.start.date() == now().date() - datetime.timedelta(days=1):
             return _("Yesterday")
         return self.start.strftime("%A, %d %B %Y")
 
