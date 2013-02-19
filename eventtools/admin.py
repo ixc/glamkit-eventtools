@@ -257,12 +257,13 @@ def EventAdmin(EventModel, SuperModel=MPTTModelAdmin, show_exclusions=False, sho
                 inline_instances.append( inline_instance )
 
 
-        def get_inline_instances(self, request):
+        def get_inline_instances(self, request, *args, **kwargs):
             """
             This overrides the regular ModelAdmin.get_inline_instances(self, request)
             """
             # Get any regular Django inlines the user may have defined.
-            inline_instances = super(_EventAdmin, self).get_inline_instances(request)
+            inline_instances = super(_EventAdmin, self).get_inline_instances(
+                request, *args, **kwargs)
             # Append our eventtools inlines
             self.append_eventtools_inlines(inline_instances)
             return inline_instances
