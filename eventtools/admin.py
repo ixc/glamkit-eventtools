@@ -233,6 +233,7 @@ def EventAdmin(EventModel, SuperModel=MPTTModelAdmin, show_exclusions=False, sho
     
     class _EventAdmin(SuperModel):
         form = EventForm(EventModel)
+        occurrence_inline = OccurrenceInline(EventModel.OccurrenceModel())
         list_display = ['unicode_bold_if_listed', 'occurrence_link', 'season', 'status'] # leave as list to allow extension
         change_form_template = kwargs['change_form_template'] if 'change_form_template' in kwargs else 'admin/eventtools/event.html'
         save_on_top = kwargs['save_on_top'] if 'save_on_top' in kwargs else True
@@ -244,7 +245,7 @@ def EventAdmin(EventModel, SuperModel=MPTTModelAdmin, show_exclusions=False, sho
 
         def append_eventtools_inlines(self, inline_instances):
             eventtools_inlines = [
-                OccurrenceInline(EventModel.OccurrenceModel()),
+                self.occurrence_inline,
             ]
             if show_generator:
                 eventtools_inlines.append(GeneratorInline(EventModel.GeneratorModel()))
