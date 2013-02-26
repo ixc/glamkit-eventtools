@@ -7,7 +7,7 @@ from eventtools.utils.datetimeify import dayify
 from eventtools.utils.managertype import ManagerType
 from eventtools.utils.pprint_timespan import pprint_datetime_span, pprint_time_span
 from django.utils.safestring import mark_safe
-from django.utils.timezone import now, localtime
+from django.utils.timezone import now, localtime, make_aware, get_default_timezone
 
 class XTimespanQSFN(object):
     """
@@ -17,9 +17,11 @@ class XTimespanQSFN(object):
 
     def starts_before(self, date):
         end = datetimeify(date, clamp="max")
+        end = make_aware(end, get_default_timezone())
         return self.filter(start__lte=end)
     def starts_after(self, date):
         start = datetimeify(date, clamp="min")
+        start = make_aware(start, get_default_timezone())
         return self.filter(start__gte=start)
     def starts_between(self, d1, d2):
         """
