@@ -72,4 +72,7 @@ class Rule(models.Model):
     def __unicode__(self):
         """Human readable string for Rule"""
         return self.name
+        
+    def normalize(self):
+        return self.complex_rule or "FREQ=%s;%s" % (self.frequency, self.params.upper())
 
