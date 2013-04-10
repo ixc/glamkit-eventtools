@@ -42,6 +42,7 @@ class Rule(models.Model):
     frequency = models.CharField(_("frequency"), choices=freqs, max_length=10, blank=True, help_text=_("the base repetition period."))
     params = models.TextField(_("inclusion parameters"), blank=True, help_text=_("extra params required to define this type of repetition."))
     complex_rule = models.TextField(_("complex rules"), help_text=_("over-rides all other settings."), blank=True)
+    normalized = models.TextField(_("RFC 2445 compliant"), help_text=_("over-rides all other settings."), blank=True)
 
     class Meta:
         verbose_name = _('repetition rule')
