@@ -222,7 +222,7 @@ class EventBase(models.Model):
             
     def get_first_occurrence(self):
         try:
-            return self.first_generator.get_first_occurrence().varied_end
+            return self.first_generator.get_first_occurrence()
         except IndexError:
             raise IndexError("This Event type has no generators defined")
     get_one_occurrence = get_first_occurrence # for backwards compatibility
@@ -235,7 +235,7 @@ class EventBase(models.Model):
         
     def get_all_occurrences_if_possible(self):
         if self.get_last_occurrence() != datetime.datetime.max:
-            return self.get_occurrences(self.get_first_occurrence(), self.get_last_occurrence())
+            return self.get_occurrences(self.get_first_occurrence().varied_start, self.get_last_occurrence())
         return None
     
     def occurrences_count(self):
