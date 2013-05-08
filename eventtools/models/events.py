@@ -235,7 +235,10 @@ class EventBase(models.Model):
         
     def get_all_occurrences_if_possible(self):
         if self.get_last_occurrence() != datetime.datetime.max:
-            return self.get_occurrences(self.get_first_occurrence().varied_start, self.get_last_occurrence())
+            if self.get_first_occurrence().varied_start > self.get_first_occurrence().unvaried_start:
+                return self.get_occurrences(self.get_first_occurrence().unvaried_start, self.get_last_occurrence())
+            else:
+                return self.get_occurrences(self.get_first_occurrence().varied_start, self.get_last_occurrence())
         return None
     
     def occurrences_count(self):
