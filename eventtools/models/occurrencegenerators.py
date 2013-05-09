@@ -253,7 +253,6 @@ class OccurrenceGeneratorBase(models.Model):
         returns a list of occurrences between the datetimes ``start`` and ``end``.
         Includes all of the exceptional Occurrences.
         """
-        
         start = datetimeify(start)
         end = datetimeify(end)
         
@@ -268,10 +267,10 @@ class OccurrenceGeneratorBase(models.Model):
                 # ...but only if they're not hidden and you want to see them
                 if not (hide_hidden and p_occ.hide_from_lists):
                     # ...but only if they are within this period
-                    if p_occ.start < end and p_occ.end >= start:
+                    if p_occ.start <= end and p_occ.end >= start:
                         final_occurrences.append(p_occ)
             else:
-              final_occurrences.append(occ)
+                final_occurrences.append(occ)
         # then add exceptional occurrences which originated outside of this period but now
         # fall within it
         final_occurrences += occ_replacer.get_additional_occurrences(start, end)
@@ -340,6 +339,7 @@ class OccurrenceGeneratorBase(models.Model):
                 unvaried_start_time = occ.unvaried_start_time,
             )
         except self.OccurrenceModel.DoesNotExist:
+#             print 'no exception', unvaried_start_date, unvaried_start_time
             return occ
                 
     def get_first_occurrence(self):

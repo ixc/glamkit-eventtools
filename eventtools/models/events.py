@@ -251,7 +251,7 @@ class EventBase(models.Model):
     def get_changed_occurrences(self):
         """
         return all the variation occurrences as well as
-        the occurences which have changed (different time, date, or cancelled)
+        the occurrences which have changed (different time, date, or cancelled)
         """
         occs = []
         variation_occs = []
