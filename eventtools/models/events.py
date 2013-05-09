@@ -242,8 +242,8 @@ class EventBase(models.Model):
         return None
     
     def occurrences_count(self):
-        if self.get_last_occurrence() != datetime.datetime.max:
-            return len(self.get_occurrences(self.first_generator.start, self.get_last_occurrence()))
+        if self.get_all_occurrences_if_possible():
+            return len(self.get_all_occurrences_if_possible())
         else:
             return '&infin;'
     occurrences_count.allow_tags = True
