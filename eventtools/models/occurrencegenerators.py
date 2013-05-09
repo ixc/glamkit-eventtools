@@ -338,8 +338,6 @@ class OccurrenceGeneratorBase(models.Model):
                 generator = self,
                 unvaried_start_date = occ.unvaried_start_date,
                 unvaried_start_time = occ.unvaried_start_time,
-#                 unvaried_end_date = occ.unvaried_end_date,
-                unvaried_end_time = occ.unvaried_end_time,
             )
         except self.OccurrenceModel.DoesNotExist:
             return occ
