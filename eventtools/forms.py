@@ -1,11 +1,44 @@
 from django import forms
 from django.http import HttpResponseRedirect
+from django.template.loader import render_to_string
+from django.utils import simplejson
 
 FORMAT_CHOICES = [
     ('webcal', 'iCal/Outlook'),
     ('google', 'Google Calendar'),
     ('ics', '.ics file'),
 ]
+
+class ExceptionsWidget(forms.HiddenInput):
+    """
+    A widget that shows the exceptions JSON data in a user-friendly format.
+    """
+    is_hidden = False
+    
+    def render(self, name, value, attrs=None):
+        # The form should display a JSON string, but we want to keep working
+        # with the original dictionary loaded from the DB value
+        form_value = value
+        if isinstance(value, dict):
+            form_value = simplejson.dumps(value)
+        # Add an "event-exceptions" class to the hidden input
+        if 'class' in attrs:
+            attrs['class'] = '%s event-exceptions' % attrs['class']
+        else:
+            attrs['class'] = 'event-exceptions'
+        # Get the hidden input containing the actual data
+        output = super(ExceptionsWidget, self).render(name, form_value, attrs)
+        # Generate a user-friendly list of exceptions
+        if not value or value == '{}':
+            exceptions = [('None', 'none'),]
+        else:
+            exceptions = value.items()[:10]
+            if len(value) > 10:
+                exceptions += [('%s more...' % (len(value) - 10), 'clear')]
+        # Append the exception list to the hidden input
+        output += render_to_string('admin/eventtools/_exception_widget.html',
+            {'exceptions': exceptions})
+        return output
 
 class OccurrenceChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):

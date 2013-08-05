@@ -13,7 +13,9 @@ from django.shortcuts import get_object_or_404, redirect
 from mptt.forms import TreeNodeChoiceField
 from mptt.admin import MPTTModelAdmin
 
-from diff import generate_diff
+from .diff import generate_diff
+from .forms import ExceptionsWidget
+
 
 def create_children(modeladmin, request, queryset):
     for event in queryset:
@@ -35,6 +37,9 @@ def EventAdmin(EventModel, SuperModel=MPTTModelAdmin): #pass in the name of your
         list_display = ('__unicode__', 'occurrence_link')
         change_form_template = 'admin/eventtools/event.html'
         save_on_top = True
+
+        class Media:
+            js = ('eventtools/js/ExceptionsWidget.js',)
 
         def __init__(self, *args, **kwargs):
             super(_EventAdmin, self).__init__(*args, **kwargs)
@@ -256,5 +261,12 @@ def GeneratorInline(GeneratorModel):
         extra = 1
         formfield_overrides = {
             models.DateTimeField: {'form_class': DateAndMaybeTimeField},
-            }        
+            }
+        
+        def formfield_for_dbfield(self, db_field, *args, **kwargs):
+            formfield = super(_GeneratorInline, self).formfield_for_dbfield(
+                db_field, *args, **kwargs)
+            if db_field.name == 'exceptions':
+                formfield.widget = ExceptionsWidget()
+            return formfield
     return _GeneratorInline

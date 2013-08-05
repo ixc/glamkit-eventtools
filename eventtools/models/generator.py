@@ -1,8 +1,9 @@
 # −*− coding: UTF−8 −*−
+from django.core import exceptions
 from django.db import models, transaction
 from django.db.models.base import ModelBase
+from django.utils import simplejson
 from django.utils.translation import ugettext, ugettext_lazy as _
-from django.core import exceptions
 
 from dateutil import rrule
 
@@ -16,6 +17,7 @@ from eventtools.utils.pprint_timespan import (
     pprint_datetime_span, pprint_date_span)
 
 from datetime import date, time, datetime, timedelta
+
 
 class GeneratorModel(models.Model):
     """
@@ -67,6 +69,12 @@ class GeneratorModel(models.Model):
             raise exceptions.ValidationError('The event timespan is longer '
                 'than the repetition frequency. The "repeat until" date may '
                 'have been mistakenly used as the "event end".')
+        if isinstance(self.exceptions, basestring):
+            try:
+                simplejson.loads(self.exceptions)
+            except simplejson.JSONDecodeError:
+                raise exceptions.ValidationError('The exceptions supplied are '
+                    'not in valid JSON format')
         super(GeneratorModel, self).clean()
 
 
@@ -227,7 +235,6 @@ class GeneratorModel(models.Model):
         """
         generate my occurrences
         """
-
         if self.rule is None: #the only occurrence in the village, boyo
             self.create_occurrence(start=self.event_start, end=self.event_end, honour_exceptions=True)
             return

@@ -1,0 +1,14 @@
+<ul>
+	{% for exception, type in exceptions %}
+		<li>
+			<span class='event-exception'>{{ exception|safe }}</span>
+			{% if type == 'clear' %}
+				<a href='#' class='clear-exceptions'>[Clear all]</a>
+			{% else %}
+				{% if type != 'none' %}
+					<a href='#'>[X]</a>
+				{% endif %}
+			{% endif %}
+		</li>
+	{% endfor %}
+</ul>
