@@ -1,5 +1,6 @@
 from datetime import date
 from django.db import models
+from django.db.models.manager import RenameManagerMethods
 from eventtools.utils.pprint_timespan \
     import pprint_datetime_span, pprint_date_span
 from django.core.exceptions import ValidationError
@@ -34,8 +35,13 @@ class SeasonManagerType(type):
                 setattr(cls, fname, SeasonManagerType._fproxy(fname))
         super(SeasonManagerType, cls).__init__(*args)
 
-class SeasonManager(models.Manager):    
-    __metaclass__ = SeasonManagerType
+
+class SeasonManagerMeta(SeasonManagerType, RenameManagerMethods):
+    pass
+
+
+class SeasonManager(models.Manager):
+    __metaclass__ = SeasonManagerMeta
 
     def get_query_set(self): 
         return SeasonQuerySet(self.model)

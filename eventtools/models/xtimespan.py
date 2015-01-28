@@ -1,6 +1,7 @@
 import datetime
 
 from django.db import models
+from django.db.models.manager import RenameManagerMethods
 from django.utils.translation import ugettext as _
 from eventtools.utils import datetimeify
 from eventtools.utils.datetimeify import dayify
@@ -49,11 +50,17 @@ class XTimespanQSFN(object):
     def recent(self):
         return self.starts_before(now())
 
+
 class XTimespanQuerySet(models.query.QuerySet, XTimespanQSFN):
     pass #all the goodness is inherited from XTimespanQSFN
 
+
+class XTimespanManagerMeta(ManagerType(XTimespanQSFN), RenameManagerMethods):
+    pass
+
+
 class XTimespanManager(models.Manager):
-    __metaclass__ = ManagerType(XTimespanQSFN)
+    __metaclass__ = XTimespanManagerMeta
 
     def get_query_set(self):
         return XTimespanQuerySet(self.model)
