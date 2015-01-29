@@ -1,16 +1,7 @@
-from dateutil.relativedelta import relativedelta
-
-from django.conf.urls.defaults import *
-from django.core.paginator import Paginator, EmptyPage, InvalidPage
+import datetime
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template.context import RequestContext
-from django.utils.safestring import mark_safe
-
-from eventtools.conf import settings
-from eventtools.utils.pprint_timespan import humanized_date_range
 from eventtools.utils.viewutils import paginate, response_as_ical, parse_GET_date
-
-import datetime
 
 
 class EventViews(object):
@@ -32,7 +23,7 @@ class EventViews(object):
 
     @property
     def urls(self):
-        from django.conf.urls.defaults import patterns, url
+        from django.conf.urls import patterns, url
 
         return (
             patterns('',
