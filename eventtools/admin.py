@@ -1,34 +1,20 @@
-import datetime
-
 import django
 from django import forms
 from eventtools.conf import settings
-from django.conf.urls.defaults import patterns, url
+from django.conf.urls import patterns, url
 from django.contrib import admin, messages
-from django.core import validators
-from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
-from django.db import models
 from django.http import QueryDict
 from django.shortcuts import get_object_or_404, redirect
 from django.forms.models import BaseInlineFormSet
 from mptt.forms import TreeNodeChoiceField
 from mptt.admin import MPTTModelAdmin
-from django.utils.translation import ugettext, ugettext_lazy as _
-from django.template.defaultfilters import date, time
+from django.utils.translation import ugettext_lazy as _
 
 from utils.diff import generate_diff
 
 from .models import Rule
-
-import django
-if django.VERSION[0] == 1 and django.VERSION[1] >= 4:
-    DJANGO14 = True
-else:
-    DJANGO14 = False
-
-if DJANGO14:
-    from .filters import IsGeneratedListFilter #needs django 1.4
+from .filters import IsGeneratedListFilter
     
 MPTT_ADMIN_LEVEL_INDENT = getattr(settings, 'MPTT_ADMIN_LEVEL_INDENT', 10)
 
@@ -100,8 +86,7 @@ def OccurrenceAdmin(OccurrenceModel):
         list_display = ['start', '_duration', 'event', 'from_a_repeating_occurrence', 'edit_link', 'status']
         list_display_links = ['start'] # this is turned off in __init__
         list_editable = ['event', 'status']
-        if DJANGO14:
-            list_filter = [IsGeneratedListFilter,]
+        list_filter = [IsGeneratedListFilter,]
         change_list_template = 'admin/eventtools/occurrence_list.html'
         fields = ("event" , "start", "_duration", "generated_by", 'status')
         readonly_fields = ('generated_by', )
