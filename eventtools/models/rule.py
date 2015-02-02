@@ -44,6 +44,7 @@ class Rule(models.Model):
         help_text=_("a short friendly name for this repetition.")
     )
     common = models.BooleanField(
+        default=False,
         help_text=_("common rules appear at the top of the list.")
     )
     frequency = models.CharField(

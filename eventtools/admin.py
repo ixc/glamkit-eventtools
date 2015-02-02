@@ -190,7 +190,7 @@ def OccurrenceAdmin(OccurrenceModel):
                     OccurrenceModel._meta.app_label,
                     OccurrenceModel._meta.module_name), object_id)
      
-        def queryset(self, request):
+        def get_queryset(self, request):
             if hasattr(request, '_event'):
                 return request._event.occurrences_in_listing()
             else:
