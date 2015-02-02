@@ -69,7 +69,7 @@ class GeneratorModel(XTimespanModel):
             
         self.is_clean = True
 
-    @transaction.commit_on_success()
+    @transaction.atomic()
     def save(self, *args, **kwargs):
         """
         Generally (and for a combination of field changes), we take a
@@ -130,7 +130,7 @@ class GeneratorModel(XTimespanModel):
                 break
             yield d
     
-    @transaction.commit_on_success()
+    @transaction.atomic()
     def _update_existing_occurrences(self):
         """
         When you change a generator and save it, it updates existing occurrences
@@ -195,7 +195,7 @@ class GeneratorModel(XTimespanModel):
                 o.save()
 
     
-    @transaction.commit_on_success()
+    @transaction.atomic()
     def _sync_occurrences(self):
     
         """

@@ -65,7 +65,7 @@ class OccurrenceQuerySet(XTimespanQuerySet, OccurrenceQSFN):
 class OccurrenceManager(XTimespanManager):
     __metaclass__ = ManagerType(OccurrenceQSFN, supertype=XTimespanManager.__metaclass__,)
 
-    def get_query_set(self): 
+    def get_queryset(self):
         return OccurrenceQuerySet(self.model)
 
 class OccurrenceModel(XTimespanModel):

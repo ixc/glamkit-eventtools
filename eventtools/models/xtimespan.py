@@ -62,7 +62,7 @@ class XTimespanManagerMeta(ManagerType(XTimespanQSFN), RenameManagerMethods):
 class XTimespanManager(models.Manager):
     __metaclass__ = XTimespanManagerMeta
 
-    def get_query_set(self):
+    def get_queryset(self):
         return XTimespanQuerySet(self.model)
 
 

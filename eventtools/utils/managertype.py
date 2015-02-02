@@ -19,7 +19,7 @@ def ManagerType(QSFN, supertype=type):
     class MyManager(models.Manager):
         __metaclass__ = ManagerType(QSFN) # injects the QS functions
 
-        def get_query_set(self):
+        def get_queryset(self):
             return MyQuerySet(self.model)
 
     class MyModel(models.Model):
@@ -34,7 +34,7 @@ def ManagerType(QSFN, supertype=type):
         @staticmethod
         def _fproxy(name):
             def f(self, *args, **kwargs):
-                return getattr(self.get_query_set(), name)(*args, **kwargs)
+                return getattr(self.get_queryset(), name)(*args, **kwargs)
             return f
 
         def __init__(cls, *args):

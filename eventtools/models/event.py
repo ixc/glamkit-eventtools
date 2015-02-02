@@ -103,27 +103,27 @@ class EventQuerySet(models.query.QuerySet):
         
 class EventTreeManager(TreeManager):
     
-    def get_query_set(self): 
+    def get_queryset(self):
         return EventQuerySet(self.model).order_by(
             self.tree_id_attr, self.left_attr)
 
     def in_listings(self):
-        return self.get_query_set().in_listings()
+        return self.get_queryset().in_listings()
 
     def occurrences(self, *args, **kwargs):
-        return self.get_query_set().occurrences(*args, **kwargs)
+        return self.get_queryset().occurrences(*args, **kwargs)
 
     def opening_occurrences(self, *args, **kwargs):
-        return self.get_query_set().opening_occurrences(*args, **kwargs)
+        return self.get_queryset().opening_occurrences(*args, **kwargs)
     def closing_occurrences(self, *args, **kwargs):
-        return self.get_query_set().closing_occurrences(*args, **kwargs)
+        return self.get_queryset().closing_occurrences(*args, **kwargs)
 
     def having_occurrences(self):
-        return self.get_query_set().having_occurrences()        
+        return self.get_queryset().having_occurrences()
     def having_n_occurrences(self, n):
-        return self.get_query_set().having_n_occurrences(n)        
+        return self.get_queryset().having_n_occurrences(n)
     def having_no_occurrences(self):
-        return self.get_query_set().having_no_occurrences()        
+        return self.get_queryset().having_no_occurrences()
             
 class EventOptions(object):
     """
