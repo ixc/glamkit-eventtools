@@ -4,11 +4,11 @@ from setuptools import setup, find_packages
  
 setup(
     name='glamkit-eventtools',
-    version='1.0.0a1',
+    version='2.0.0a1',
     description='An event management app for Django.',
-    author='Greg Turner',
-    author_email='greg@interaction.net.au',
-    url='http://github.com/glamkit/glamkit-eventtools',
+    author='The Interaction Consortium',
+    author_email='admins@interaction.net.au',
+    url='http://github.com/ixc/glamkit-eventtools',
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
@@ -20,10 +20,12 @@ setup(
                  'Operating System :: OS Independent',
                  'Programming Language :: Python',
                  'Topic :: Utilities'],
-    install_requires=['setuptools', 'vobject==0.8.1c', 'python-dateutil==1.5', 'django-mptt>=0.5'],
+    install_requires=[
+		'python-dateutil==1.5',
+		'vobject==0.8.2',
+		'django-mptt<0.7', # 0.7 drops support for Django 1.5
+	],
     license='BSD',
     test_suite = "eventtools.tests",
 )
 
-# also requires libraries in REQUIREMENTS.txt
-# pip install -r REQUIREMENTS.txt
