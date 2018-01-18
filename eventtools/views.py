@@ -25,10 +25,32 @@ class EventViews(object):
 
     def __init__(self, event_qs, occurrence_qs=None):
         self.event_qs = event_qs
+        self._occurrence_qs = occurrence_qs
 
-        if occurrence_qs is None:
-            occurrence_qs = self.event_qs.occurrences()
-        self.occurrence_qs = occurrence_qs
+    @property
+    def occurrence_qs(self):
+        """
+        Most views are built such that they get occurrence_qs at the start,
+        then apply various filters. This creates a lot of overhead, because
+        every time a new filtered queryset is evaluated, the event_qs query
+        is also included as a join in that query. That query, however, is
+        quite complex, since it has a filter on an aggregate MAX value. To
+        simplify the future filtering done on the occurrences queryset, we
+        replace the event_qs queryset with a pre-evaluated list. This is done
+        once for every time `.occurrence_qs` is requested, which should be
+        once per request, keeping the filtering up-to-date.
+        """
+        if self._occurrence_qs is None:
+            event_qs = self.event_qs
+            if self.event_qs.distinct().count() < 100:
+                event_qs = list(
+                    self.event_qs.order_by().distinct().values_list('pk', flat=True)
+                )
+            # Unfortunately we have to resort to duplicating the `occurrences()`
+            # code here, instead of calling it, which is less than ideal
+            return self.event_qs.model.OccurrenceModel().objects\
+                .filter(event__in=event_qs)
+        return self._occurrence_qs
 
     @property
     def urls(self):

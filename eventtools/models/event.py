@@ -61,16 +61,8 @@ class EventQuerySet(models.query.QuerySet):
         Returns the occurrences for events in this queryset. NB that only
         occurrences attached directly to events, ie not child events, are returned.
         """
-        events = self
-        # Since we're likely to be filtering occurrences against this a lot,
-        # avoid having the query (which is complex due to the MAX filtering)
-        # executed every time, unless there are a lot of results.
-        if events.distinct().count() < 100:
-            events = list(
-                self.order_by().distinct().values_list('pk', flat=True)
-            )
         return self.model.OccurrenceModel().objects\
-            .filter(event__in=events)
+            .filter(event__in=self)
                 
     def opening_occurrences(self):
         """
